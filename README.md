@@ -4,7 +4,7 @@
 [![Ubercart](https://img.shields.io/badge/Ubercart-v3.5-green.svg)](http://www.ubercart.org/)
 [![PHP v5.3](https://img.shields.io/badge/php-v5.3-yellow.svg)](http://www.php.net)
 
-Wirecard Checkout Page plugin for Ubercart. 
+Wirecard Checkout Page plugin for Ubercart (Drupal). 
 
 Our [Online Guides](https://guides.wirecard.at/) provide further information on payment methods and additional features. 
 
