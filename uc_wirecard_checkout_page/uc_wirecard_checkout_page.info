@@ -1,0 +1,6 @@
+name = Wirecard Checkout Page
+description = Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.
+package = Ubercart - payment
+core = 7.x
+dependencies[] = date
+dependencies[] = uc_payment
