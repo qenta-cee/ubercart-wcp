@@ -609,8 +609,7 @@ function uc_wirecard_checkout_page_initiate_payment($order) {
                                                      'SECRET' => variable_get('uc_wirecard_checkout_page_secret'),
                                                      'LANGUAGE' => $language->language
                                                 ));
-  //print_r($order);
-  //die;
+
   $consumerData = new WirecardCEE_Stdlib_ConsumerData();
   $consumerData->setUserAgent($_SERVER['HTTP_USER_AGENT'])
     ->setIpAddress($_SERVER['REMOTE_ADDR']);
@@ -653,7 +652,7 @@ function uc_wirecard_checkout_page_initiate_payment($order) {
     ->setDuplicateRequestCheck(FALSE)
     ->setMaxRetries(variable_get('uc_wirecard_checkout_page_max_retries'))
     ->setAutoDeposit(variable_get('uc_wirecard_checkout_page_auto_deposit'))
-    ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME);
+    ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME)->createConsumerMerchantCrmId($user->mail);
 
   $client->ubercartOrderId = $order->order_id;
   $client->ubercartCartId = uc_cart_get_id();
