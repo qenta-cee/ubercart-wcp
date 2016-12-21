@@ -32,29 +32,52 @@
 
 
 /**
- * @name WirecardCEE_Stdlib_Module_ModuleAbstract
+ * @name WirecardCEE_Stdlib_Return_Success_SepaDD
  * @category WirecardCEE
- * @package WirecardCEE_Stdlib
- * @subpackage Module
- * @abstract
+ * @package WirecardCEE_QMore
+ * @subpackage Return_Success
  */
-abstract class WirecardCEE_Stdlib_Module_ModuleAbstract implements WirecardCEE_Stdlib_Module_ModuleInterface
+abstract class WirecardCEE_Stdlib_Return_Success_SepaDD extends WirecardCEE_Stdlib_Return_Success
 {
-    /**
-     * Returns the user configuration details found in 'Config' directory
-     * (user.config.php)
-     *
-     * @return Array
-     * @abstract
-     */
-    public static function getConfig() { }
 
     /**
-     * Returns the client configuration details found in 'Config' directory
-     * (client.config.php)
+     * getter for the return parameter creditorId
      *
-     * @return Array
-     * @abstract
+     * @return string
      */
-    public static function getClientConfig() { }
+    public function getCreditorId()
+    {
+        return $this->creditorId;
+    }
+
+    /**
+     * getter for the return parameter dueDate
+     *
+     * @return string
+     */
+    public function getDueDate()
+    {
+        return $this->dueDate;
+    }
+
+    /**
+     * getter for the return parameter mandateId
+     *
+     * @return string
+     */
+    public function getMandateId()
+    {
+        return $this->mandateId;
+    }
+
+    /**
+     * getter for the return parameter mandateSignatureDate
+     *
+     * @return string
+     */
+    public function getMandateSignatureDate()
+    {
+        return $this->mandateSignatureDate;
+    }
+
 }
