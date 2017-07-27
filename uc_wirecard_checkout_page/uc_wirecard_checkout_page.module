@@ -43,7 +43,6 @@
 define('UC_WIRECARD_CHECKOUT_PAGE_NAME', 'Uebercart35_WirecardCheckoutPage');
 define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.1.0');
 define('UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME', 'WirecardCheckoutPageFrame');
-define('UC_WIRECARD_CHECKOUT_PAGE_INVOICE_INSTALLMENT_MIN_AGE', 18);
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname(__FILE__) . '/library');
 
@@ -527,20 +526,6 @@ function uc_wirecard_checkout_page_menu() {
  */
 function uc_wirecard_checkout_page_invoice_allowed($order) {
 
-  $user = user_load($order->uid);
-
-  if (!property_exists($user, 'field_birthdate')) {
-    return FALSE;
-  }
-
-  $birthdate = $user->field_birthdate['und'][0]['value'];
-  $d1 = new DateTime($birthdate);
-  $diff = $d1->diff(new DateTime);
-  $customerAge = $diff->format('%y');
-  if ($customerAge < UC_WIRECARD_CHECKOUT_PAGE_INVOICE_INSTALLMENT_MIN_AGE) {
-    return FALSE;
-  }
-
   if ($order->currency != 'EUR') {
     return FALSE;
   }
@@ -565,20 +550,6 @@ function uc_wirecard_checkout_page_invoice_allowed($order) {
  * @return bool
  */
 function uc_wirecard_checkout_page_installment_allowed($order) {
-
-  $user = user_load($order->uid);
-
-  if (!property_exists($user, 'field_birthdate')) {
-    return FALSE;
-  }
-
-  $birthdate = $user->field_birthdate['und'][0]['value'];
-  $d1 = new DateTime($birthdate);
-  $diff = $d1->diff(new DateTime);
-  $customerAge = $diff->format('%y');
-  if ($customerAge < UC_WIRECARD_CHECKOUT_PAGE_INVOICE_INSTALLMENT_MIN_AGE) {
-    return FALSE;
-  }
 
   if ($order->currency != 'EUR') {
     return FALSE;
