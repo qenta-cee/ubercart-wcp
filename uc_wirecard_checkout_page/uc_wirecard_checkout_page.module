@@ -97,6 +97,7 @@ function uc_wirecard_checkout_page_uc_payment_gateway() {
  *
  * @return array
  */
+
 function uc_wirecard_checkout_page_uc_payment_method() {
   $methods[] = array(
     'id' => 'uc_wcp_select',
@@ -141,7 +142,7 @@ function uc_wirecard_checkout_page_uc_payment_method() {
   $methods[] = array(
     'id' => 'uc_wcp_eps',
     'name' => t('Wirecard Checkout Page eps Online Bank Transfer'),
-    'title' => t('Wirecard Checkout Page eps Online Bank Transfer'),
+    'title' => t('Wirecard Checkout Page eps Online Bank Transfer').Partial::eps(),
     'desc' => t('Wirecard Checkout Page eps Online Bank Transfer'),
     'callback' => 'uc_wirecard_checkout_page',
     'redirect' => 'uc_wirecard_checkout_page_form',
@@ -151,7 +152,7 @@ function uc_wirecard_checkout_page_uc_payment_method() {
   $methods[] = array(
     'id' => 'uc_wcp_idl',
     'name' => t('Wirecard Checkout Page iDEAL'),
-    'title' => t('Wirecard Checkout Page iDEAL'),
+    'title' => t('Wirecard Checkout Page iDEAL').Partial::ideal(),
     'desc' => t('Wirecard Checkout Page iDEAL'),
     'callback' => 'uc_wirecard_checkout_page',
     'redirect' => 'uc_wirecard_checkout_page_form',
@@ -241,7 +242,7 @@ function uc_wirecard_checkout_page_uc_payment_method() {
   $methods[] = array(
     'id' => 'uc_wcp_invoice',
     'name' => t('Wirecard Checkout Page Invoice'),
-    'title' => t('Wirecard Checkout Page Invoice'),
+    'title' => t('Wirecard Checkout Page Invoice').Partial::invoice(),
     'desc' => t('Wirecard Checkout Page Invoice'),
     'callback' => 'uc_wirecard_checkout_page',
     'redirect' => 'uc_wirecard_checkout_page_form',
