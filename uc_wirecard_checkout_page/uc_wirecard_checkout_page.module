@@ -660,20 +660,19 @@ function uc_wirecard_checkout_page_menu()
  */
 function uc_wirecard_checkout_page_invoice_allowed($order)
 {
-
+    $min_amount = intval(variable_get('uc_wirecard_checkout_page_invoice_min_amount', 10));
+    $max_amount = intval(variable_get('uc_wirecard_checkout_page_invoice_max_amount', 3500));
     if (strpos(variable_get('uc_wirecard_checkout_page_invoice_accepted_currencies', 'EUR'), $order->currency) === false
     ) {
         return t('Currency not allowed: ') . $order->currency;
     }
 
-    if (intval(variable_get('uc_wirecard_checkout_page_invoice_min_amount', 10)) > $order->order_total) {
-        return t('Minimum order total not reached: ') . intval(variable_get('uc_wirecard_checkout_page_invoice_min_amount',
-            10));
+    if ($min_amount > $order->order_total) {
+        return t('Minimum order total not reached: ') . uc_currency_format($min_amount);
     }
 
-    if (intval(variable_get('uc_wirecard_checkout_page_invoice_max_amount', 3500)) < $order->order_total) {
-        return t('Maximum order total exceeded: ') . intval(variable_get('uc_wirecard_checkout_page_invoice_max_amount',
-            3500));
+    if ($max_amount < $order->order_total) {
+        return t('Maximum order total exceeded: ') . uc_currency_format($max_amount);
     }
 
     $fields = array(
@@ -721,7 +720,7 @@ function uc_wirecard_checkout_page_installment_allowed($order)
     }
 
     if ($order->order_total > $max_amount) {
-        return t('Maximum order total exceeded: ') . $max_amount;
+        return t('Maximum order total exceeded: ') . uc_currency_format($max_amount);
     }
 
     $fields = array(
