@@ -41,7 +41,7 @@
  */
 
 define('UC_WIRECARD_CHECKOUT_PAGE_NAME', 'Uebercart35_WirecardCheckoutPage');
-define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.1.0');
+define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.0');
 define('UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME', 'WirecardCheckoutPageFrame');
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname(__FILE__) . '/library');
@@ -62,14 +62,15 @@ require_once 'partials/Partial.php';
  * @return string
  */
 
-function uc_wirecard_checkout_page_help($path, $arg) {
-  switch ($path) {
-    case "admin/help#uc_wirecard_checkout_page":
-      return '<p>' . t(
-        'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
-      ) . '</p>';
-      break;
-  }
+function uc_wirecard_checkout_page_help($path, $arg)
+{
+    switch ($path) {
+        case "admin/help#uc_wirecard_checkout_page":
+            return '<p>' . t(
+                'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
+            ) . '</p>';
+            break;
+    }
 }
 
 /**
@@ -77,14 +78,15 @@ function uc_wirecard_checkout_page_help($path, $arg) {
  *
  * @return mixed
  */
-function uc_wirecard_checkout_page_uc_payment_gateway() {
-  $gateways['uc_wirecard_checkout_page'] = array(
-    'title' => t('Wirecard Checkout Page'),
-    'description' => t(
-      'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
-    ),
-  );
-  return $gateways;
+function uc_wirecard_checkout_page_uc_payment_gateway()
+{
+    $gateways['uc_wirecard_checkout_page'] = array(
+        'title' => t('Wirecard Checkout Page'),
+        'description' => t(
+            'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
+        ),
+    );
+    return $gateways;
 }
 
 /**
@@ -97,259 +99,260 @@ function uc_wirecard_checkout_page_uc_payment_gateway() {
  * @return array
  */
 
-function uc_wirecard_checkout_page_uc_payment_method() {
-  $methods[] = array(
-    'id' => 'uc_wcp_select',
-    'name' => t('Wirecard Checkout Page Select'),
-    'title' => t('Wirecard Checkout Page Select'),
-    'desc' => t('Wirecard Checkout Page Select'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 100,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_ccard',
-    'name' => t('Wirecard Checkout Page Credit Card'),
-    'title' => t('Wirecard Checkout Page Credit Card'),
-    'desc' => t('Wirecard Checkout Page Credit Card'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 110,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_ccard-moto',
-    'name' => t('Wirecard Checkout Page Credit Card MoTo'),
-    'title' => t('Wirecard Checkout Page Credit Card MoTo'),
-    'desc' => t('Wirecard Checkout Page Credit Card MoTo'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 120,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_maestro',
-    'name' => t('Wirecard Checkout Page Maestro SecureCode'),
-    'title' => t('Wirecard Checkout Page Maestro SecureCode'),
-    'desc' => t('Wirecard Checkout Page Maestro SecureCode'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 130,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_eps',
-    'name' => t('Wirecard Checkout Page eps Online Bank Transfer'),
-    'title' => t('Wirecard Checkout Page eps Online Bank Transfer').Partial::eps(),
-    'desc' => t('Wirecard Checkout Page eps Online Bank Transfer'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 140,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_idl',
-    'name' => t('Wirecard Checkout Page iDEAL'),
-    'title' => t('Wirecard Checkout Page iDEAL').Partial::ideal(),
-    'desc' => t('Wirecard Checkout Page iDEAL'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 150,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_giropay',
-    'name' => t('Wirecard Checkout Page giropay'),
-    'title' => t('Wirecard Checkout Page giropay'),
-    'desc' => t('Wirecard Checkout Page giropay'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 160,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_sofortueberweisung',
-    'name' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-    'title' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-    'desc' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 170,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_pbx',
-    'name' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
-    'title' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
-    'desc' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 180,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_psc',
-    'name' => t('Wirecard Checkout Page paysafecard'),
-    'title' => t('Wirecard Checkout Page paysafecard'),
-    'desc' => t('Wirecard Checkout Page paysafecard'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 190,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_quick',
-    'name' => t('Wirecard Checkout Page @QUICK'),
-    'title' => t('Wirecard Checkout Page @QUICK'),
-    'desc' => t('Wirecard Checkout Page @QUICK'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 200,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_paypal',
-    'name' => t('Wirecard Checkout Page PayPal'),
-    'title' => t('Wirecard Checkout Page PayPal'),
-    'desc' => t('Wirecard Checkout Page PayPal'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 210,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_elv',
-    'name' => t('Wirecard Checkout Page Direct Debit'),
-    'title' => t('Wirecard Checkout Page Direct Debit'),
-    'desc' => t('Wirecard Checkout Page Direct Debit'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 220,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_c2p',
-    'name' => t('Wirecard Checkout Page CLICK2PAY'),
-    'title' => t('Wirecard Checkout Page CLICK2PAY'),
-    'desc' => t('Wirecard Checkout Page CLICK2PAY'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 230,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_invoice',
-    'name' => t('Wirecard Checkout Page Invoice'),
-    'title' => t('Wirecard Checkout Page Invoice').Partial::invoice(),
-    'desc' => t('Wirecard Checkout Page Invoice'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 240,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_installment',
-    'name' => t('Wirecard Checkout Page Installment'),
-    'title' => t('Wirecard Checkout Page Installment'),
-    'desc' => t('Wirecard Checkout Page Installment'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 250,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_bancontact_mistercash',
-    'name' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
-    'title' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
-    'desc' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 260,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_przelewy24',
-    'name' => t('Wirecard Checkout Page Przelewy24'),
-    'title' => t('Wirecard Checkout Page Przelewy24'),
-    'desc' => t('Wirecard Checkout Page Przelewy24'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 270,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_moneta',
-    'name' => t('Wirecard Checkout Page moneta.ru'),
-    'title' => t('Wirecard Checkout Page moneta.ru'),
-    'desc' => t('Wirecard Checkout Page moneta.ru'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 280,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_poli',
-    'name' => t('Wirecard Checkout Page POLi'),
-    'title' => t('Wirecard Checkout Page POLi'),
-    'desc' => t('Wirecard Checkout Page POLi'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 290,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_ekonto',
-    'name' => t('Wirecard Checkout Page eKonto'),
-    'title' => t('Wirecard Checkout Page eKonto'),
-    'desc' => t('Wirecard Checkout Page eKonto'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 300,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_instantbank',
-    'name' => t('Wirecard Checkout Page InstantBank'),
-    'title' => t('Wirecard Checkout Page InstantBank'),
-    'desc' => t('Wirecard Checkout Page InstantBank'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 310,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_mpass',
-    'name' => t('Wirecard Checkout Page mpass'),
-    'title' => t('Wirecard Checkout Page mpass'),
-    'desc' => t('Wirecard Checkout Page mpass'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 320,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_skrilldirect',
-    'name' => t('Wirecard Checkout Page Skrill Direct'),
-    'title' => t('Wirecard Checkout Page Skrill Direct'),
-    'desc' => t('Wirecard Checkout Page Skrill Direct'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 330,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_skrillwallet',
-    'name' => t('Wirecard Checkout Page Skrill Digital Wallet'),
-    'title' => t('Wirecard Checkout Page Skrill Digital Wallet'),
-    'desc' => t('Wirecard Checkout Page Skrill Digital Wallet'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 340,
-    'checkout' => TRUE,
-  );
+function uc_wirecard_checkout_page_uc_payment_method()
+{
+    $methods[] = array(
+        'id' => 'uc_wcp_select',
+        'name' => t('Wirecard Checkout Page Select'),
+        'title' => t('Wirecard Checkout Page Select'),
+        'desc' => t('Wirecard Checkout Page Select'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 100,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_ccard',
+        'name' => t('Wirecard Checkout Page Credit Card'),
+        'title' => t('Wirecard Checkout Page Credit Card'),
+        'desc' => t('Wirecard Checkout Page Credit Card'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 110,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_ccard-moto',
+        'name' => t('Wirecard Checkout Page Credit Card MoTo'),
+        'title' => t('Wirecard Checkout Page Credit Card MoTo'),
+        'desc' => t('Wirecard Checkout Page Credit Card MoTo'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 120,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_maestro',
+        'name' => t('Wirecard Checkout Page Maestro SecureCode'),
+        'title' => t('Wirecard Checkout Page Maestro SecureCode'),
+        'desc' => t('Wirecard Checkout Page Maestro SecureCode'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 130,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_eps',
+        'name' => t('Wirecard Checkout Page eps Online Bank Transfer'),
+        'title' => t('Wirecard Checkout Page eps Online Bank Transfer') . Partial::eps(),
+        'desc' => t('Wirecard Checkout Page eps Online Bank Transfer'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 140,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_idl',
+        'name' => t('Wirecard Checkout Page iDEAL'),
+        'title' => t('Wirecard Checkout Page iDEAL') . Partial::ideal(),
+        'desc' => t('Wirecard Checkout Page iDEAL'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 150,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_giropay',
+        'name' => t('Wirecard Checkout Page giropay'),
+        'title' => t('Wirecard Checkout Page giropay'),
+        'desc' => t('Wirecard Checkout Page giropay'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 160,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_sofortueberweisung',
+        'name' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
+        'title' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
+        'desc' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 170,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_pbx',
+        'name' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
+        'title' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
+        'desc' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 180,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_psc',
+        'name' => t('Wirecard Checkout Page paysafecard'),
+        'title' => t('Wirecard Checkout Page paysafecard'),
+        'desc' => t('Wirecard Checkout Page paysafecard'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 190,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_quick',
+        'name' => t('Wirecard Checkout Page @QUICK'),
+        'title' => t('Wirecard Checkout Page @QUICK'),
+        'desc' => t('Wirecard Checkout Page @QUICK'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 200,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_paypal',
+        'name' => t('Wirecard Checkout Page PayPal'),
+        'title' => t('Wirecard Checkout Page PayPal'),
+        'desc' => t('Wirecard Checkout Page PayPal'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 210,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_elv',
+        'name' => t('Wirecard Checkout Page Direct Debit'),
+        'title' => t('Wirecard Checkout Page Direct Debit'),
+        'desc' => t('Wirecard Checkout Page Direct Debit'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 220,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_c2p',
+        'name' => t('Wirecard Checkout Page CLICK2PAY'),
+        'title' => t('Wirecard Checkout Page CLICK2PAY'),
+        'desc' => t('Wirecard Checkout Page CLICK2PAY'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 230,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_invoice',
+        'name' => t('Wirecard Checkout Page Invoice'),
+        'title' => t('Wirecard Checkout Page Invoice') . Partial::invoice(),
+        'desc' => t('Wirecard Checkout Page Invoice'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 240,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_installment',
+        'name' => t('Wirecard Checkout Page Installment'),
+        'title' => t('Wirecard Checkout Page Installment') . Partial::installment(),
+        'desc' => t('Wirecard Checkout Page Installment'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 250,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_bancontact_mistercash',
+        'name' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
+        'title' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
+        'desc' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 260,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_przelewy24',
+        'name' => t('Wirecard Checkout Page Przelewy24'),
+        'title' => t('Wirecard Checkout Page Przelewy24'),
+        'desc' => t('Wirecard Checkout Page Przelewy24'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 270,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_moneta',
+        'name' => t('Wirecard Checkout Page moneta.ru'),
+        'title' => t('Wirecard Checkout Page moneta.ru'),
+        'desc' => t('Wirecard Checkout Page moneta.ru'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 280,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_poli',
+        'name' => t('Wirecard Checkout Page POLi'),
+        'title' => t('Wirecard Checkout Page POLi'),
+        'desc' => t('Wirecard Checkout Page POLi'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 290,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_ekonto',
+        'name' => t('Wirecard Checkout Page eKonto'),
+        'title' => t('Wirecard Checkout Page eKonto'),
+        'desc' => t('Wirecard Checkout Page eKonto'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 300,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_instantbank',
+        'name' => t('Wirecard Checkout Page InstantBank'),
+        'title' => t('Wirecard Checkout Page InstantBank'),
+        'desc' => t('Wirecard Checkout Page InstantBank'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 310,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_mpass',
+        'name' => t('Wirecard Checkout Page mpass'),
+        'title' => t('Wirecard Checkout Page mpass'),
+        'desc' => t('Wirecard Checkout Page mpass'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 320,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_skrilldirect',
+        'name' => t('Wirecard Checkout Page Skrill Direct'),
+        'title' => t('Wirecard Checkout Page Skrill Direct'),
+        'desc' => t('Wirecard Checkout Page Skrill Direct'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 330,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_skrillwallet',
+        'name' => t('Wirecard Checkout Page Skrill Digital Wallet'),
+        'title' => t('Wirecard Checkout Page Skrill Digital Wallet'),
+        'desc' => t('Wirecard Checkout Page Skrill Digital Wallet'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 340,
+        'checkout' => true,
+    );
 
-  return $methods;
+    return $methods;
 }
 
 /**
