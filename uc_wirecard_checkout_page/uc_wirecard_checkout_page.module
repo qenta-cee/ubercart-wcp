@@ -322,26 +322,6 @@ function uc_wirecard_checkout_page_uc_payment_method()
         'checkout' => true,
     );
     $methods[] = array(
-        'id' => 'uc_wcp_mpass',
-        'name' => t('Wirecard Checkout Page mpass'),
-        'title' => t('Wirecard Checkout Page mpass'),
-        'desc' => t('Wirecard Checkout Page mpass'),
-        'callback' => 'uc_wirecard_checkout_page',
-        'redirect' => 'uc_wirecard_checkout_page_form',
-        'weight' => 320,
-        'checkout' => true,
-    );
-    $methods[] = array(
-        'id' => 'uc_wcp_skrilldirect',
-        'name' => t('Wirecard Checkout Page Skrill Direct'),
-        'title' => t('Wirecard Checkout Page Skrill Direct'),
-        'desc' => t('Wirecard Checkout Page Skrill Direct'),
-        'callback' => 'uc_wirecard_checkout_page',
-        'redirect' => 'uc_wirecard_checkout_page_form',
-        'weight' => 330,
-        'checkout' => true,
-    );
-    $methods[] = array(
         'id' => 'uc_wcp_skrillwallet',
         'name' => t('Wirecard Checkout Page Skrill Digital Wallet'),
         'title' => t('Wirecard Checkout Page Skrill Digital Wallet'),
