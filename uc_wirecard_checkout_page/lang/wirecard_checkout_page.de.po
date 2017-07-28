@@ -328,7 +328,16 @@ msgid "You have to be 18 years or older to use this payment."
 msgstr "Sie müssen 18 Jahre oder älter sein, um diese Zahlungsart verwenden zu dürfen."
 
 msgid "Consumer must accept payolution terms during the checkout process."
-msgstr "Kunden müssen die Nutzungsbedingungen von payolution während des Bezahlprozesses akzeptieren."msgstr "Kunden müssen die Nutzungsbedingungen von payolution während des Bezahlprozesses akzeptieren."
+msgstr "Kunden müssen die Nutzungsbedingungen von payolution während des Bezahlprozesses akzeptieren."
 
 msgid "Financial institution"
 msgstr "Finanzinstitut"
+
+msgid "Minimum order total not reached: "
+msgstr "Minimaler Bestellwert nicht erreicht: "
+
+msgid "Maximum order total exceeded: "
+msgstr "Maximaler Bestellwert überschritten: "
+
+msgid "Currency not allowed: "
+msgstr "Währung nicht erlaubt: "
