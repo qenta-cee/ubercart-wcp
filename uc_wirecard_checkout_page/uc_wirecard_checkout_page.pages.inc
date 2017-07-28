@@ -310,3 +310,11 @@ function uc_wirecard_checkout_page_iframe() {
 
 
 }
+
+
+/**
+ * store additional data during checkout
+ */
+function uc_wirecard_checkout_page_store_additional_data(){
+    $_SESSION['wcp_additional'] = $_POST;
+}

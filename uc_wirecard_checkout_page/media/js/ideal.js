@@ -40,4 +40,15 @@ $(document).ready(function() {
     $.each(institutions,function(a,b){
         $("#wcp_ideal_financialInstitution").find('select').append('<option value="'+a+'">'+b+'</option>');
     });
+
+    $("#edit-continue").click(function(){
+        $.ajax({
+            url:'wirecard_checkout_page/store',
+            type:'POST',
+            async:false,
+            data:{
+                financialInstitution:$('select[name=idealFinancialInstitution] option:selected').val()
+            }
+        });
+    });
 });

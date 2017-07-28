@@ -642,6 +642,13 @@ function uc_wirecard_checkout_page_menu()
         'type' => MENU_CALLBACK,
         'file' => 'uc_wirecard_checkout_page.pages.inc',
     );
+    $items['cart/wirecard_checkout_page/store'] = array(
+        'title' => 'Wirecard Checkout Page Store Data',
+        'page callback' => 'uc_wirecard_checkout_page_store_additional_data',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
 
     return $items;
 }
@@ -836,6 +843,11 @@ function uc_wirecard_checkout_page_initiate_payment($order)
         ->setAutoDeposit(variable_get('uc_wirecard_checkout_page_auto_deposit'))
         ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME)->createConsumerMerchantCrmId($user->mail);
 
+    if(isset($_SESSION['wcp_additional'])){
+        foreach($_SESSION['wcp_additional'] as $method=>$value) {
+            $client->{"set$method"}($value);
+        }
+    }
     $client->ubercartOrderId = $order->order_id;
     $client->ubercartCartId = uc_cart_get_id();
 
