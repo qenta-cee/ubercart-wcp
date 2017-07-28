@@ -17,7 +17,7 @@
  * for any errors occurring when used in an enhanced, customized shop system
  * configuration.
  *
- * Operation in an enhanced, customized configuration is at your own risk and
+ * Operation in an enhanced, customized configuration is at your own rissk and
  * requires a comprehensive test phase by the user of the plugin.
  *
  * Customers use the plugins at their own risk. Wirecard CEE does not guarantee
@@ -34,12 +34,12 @@
  * terms of use!
  */
 $a = '<div class="wcp_pm_additional">';
-$a .= '<div id="wcp_invoice_birthday">' . t('Birthday') . ':</div>';
-$a .= '<div id="wcp_invoice_too_young">' . t('You have to be 18 years or older to use this payment.') . '</div>';
+$a .= '<div id="wcp_installment_birthday">' . t('Birthday') . ':</div>';
+$a .= '<div id="wcp_installment_too_young">' . t('You have to be 18 years or older to use this payment.') . '</div>';
 
-if (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'payolution' && variable_get('uc_wirecard_checkout_page_payolution_terms') == true) {
-    $a .= '<div id="wcp_invoice_payolution_terms">' . t('I agree that the data which are necessary for the liquidation of installments and which are used to complete the identity and credit check are transmitted to payolution.  My __consent__ can be revoked at any time with future effect.') . '</div>';
-    $a .= '<div id="wcp_invoice_payolution_terms_not_checked">' . t('Consumer must accept payolution terms during the checkout process.') . '</div>';
+if (variable_get('uc_wirecard_checkout_page_installment_provider') == 'payolution' && variable_get('uc_wirecard_checkout_page_payolution_terms') == true) {
+    $a .= '<div id="wcp_installment_payolution_terms">' . t('I agree that the data which are necessary for the liquidation of installments and which are used to complete the identity and credit check are transmitted to payolution.  My __consent__ can be revoked at any time with future effect.') . '</div>';
+    $a .= '<div id="wcp_installment_payolution_terms_not_checked">' . t('Consumer must accept payolution terms during the checkout process.') . '</div>';
 }
 
 $a .= '</div>';

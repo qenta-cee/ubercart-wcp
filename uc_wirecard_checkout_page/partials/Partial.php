@@ -54,7 +54,12 @@ class Partial
      *
      * @return mixed
      */
-    static function installment(){}
+    static function installment(){
+        drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/installment.css');
+        drupal_add_library('system', 'ui.datepicker');
+        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/installment.js');
+        return include "installment.php";
+    }
 
     static function ideal(){}
 
