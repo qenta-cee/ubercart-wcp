@@ -587,26 +587,31 @@ function uc_wirecard_checkout_page_form($form, &$form_state, $order)
         '#value' => t('Submit Orders')
     );
 
-  try {
-    $client = uc_wirecard_checkout_page_initiate_payment($order);
-    $response = $client->initiate();
-
-    if ($response->hasFailed()) {
-      watchdog(
-        'Wirecard Checkout Page',
-        "Response failed! Error: @message",
-        array('@message' => $response->getError()->getMessage()),
-        WATCHDOG_ERROR
-      );
-
-      drupal_set_message($response->getError()->getMessage(), 'error');
+    if (variable_get('uc_wirecard_checkout_page_use_iframe')) {
+        $form['#action'] = url('cart/wirecard_checkout_page/iframe');
+        return $form;
     }
-  } catch (Exception $e) {
-    throw($e);
-  }
 
-  $form['#action'] = $response->getRedirectUrl();
-  return $form;
+    try {
+        $client = uc_wirecard_checkout_page_initiate_payment($order);
+        $response = $client->initiate();
+
+        if ($response->hasFailed()) {
+            watchdog(
+                'Wirecard Checkout Page',
+                "Response failed! Error: @message",
+                array('@message' => $response->getError()->getMessage()),
+                WATCHDOG_ERROR
+            );
+
+            drupal_set_message($response->getError()->getMessage(), 'error');
+        }
+    } catch (Exception $e) {
+        throw($e);
+    }
+
+    $form['#action'] = $response->getRedirectUrl();
+    return $form;
 }
 
 /**
@@ -614,30 +619,31 @@ function uc_wirecard_checkout_page_form($form, &$form_state, $order)
  *
  * @return mixed
  */
-function uc_wirecard_checkout_page_menu() {
-  $items['cart/wirecard_checkout_page/confirm'] = array(
-    'title' => 'Server2server request payment status',
-    'page callback' => 'uc_wirecard_checkout_page_confirm',
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-    'file' => 'uc_wirecard_checkout_page.pages.inc',
-  );
-  $items['cart/wirecard_checkout_page/return'] = array(
-    'title' => 'Browser return from payment page',
-    'page callback' => 'uc_wirecard_checkout_page_return',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-    'file' => 'uc_wirecard_checkout_page.pages.inc',
-  );
-  $items['cart/wirecard_checkout_page/iframe'] = array(
-    'title' => 'Wirecard Checkout Page',
-    'page callback' => 'uc_wirecard_checkout_page_iframe',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-    'file' => 'uc_wirecard_checkout_page.pages.inc',
-  );
+function uc_wirecard_checkout_page_menu()
+{
+    $items['cart/wirecard_checkout_page/confirm'] = array(
+        'title' => 'Server2server request payment status',
+        'page callback' => 'uc_wirecard_checkout_page_confirm',
+        'access callback' => true,
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
+    $items['cart/wirecard_checkout_page/return'] = array(
+        'title' => 'Browser return from payment page',
+        'page callback' => 'uc_wirecard_checkout_page_return',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
+    $items['cart/wirecard_checkout_page/iframe'] = array(
+        'title' => 'Wirecard Checkout Page',
+        'page callback' => 'uc_wirecard_checkout_page_iframe',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
 
-  return $items;
+    return $items;
 }
 
 
@@ -648,7 +654,7 @@ function uc_wirecard_checkout_page_menu() {
 /**
  * check whether invoice is allowed
  *
- * @param $order
+ * @param UcOrder $order
  *
  * @return bool
  */
@@ -669,7 +675,6 @@ function uc_wirecard_checkout_page_invoice_allowed($order)
         return t('Maximum order total exceeded: ') . intval(variable_get('uc_wirecard_checkout_page_invoice_max_amount',
             3500));
     }
-  }
 
     $fields = array(
         'country',
@@ -738,7 +743,6 @@ function uc_wirecard_checkout_page_installment_allowed($order)
             }
         }
     }
-  }
 
     return true;
 }
