@@ -575,7 +575,7 @@ function uc_wirecard_checkout_page_form($form, &$form_state, $order)
         drupal_goto('cart/checkout');
     }
 
-    if ($order->payment_method == 'uc_wcp_installment' && !uc_wirecard_checkout_page_installment_allowed($order) !== true) {
+    if ($order->payment_method == 'uc_wcp_installment' && uc_wirecard_checkout_page_installment_allowed($order) !== true) {
         drupal_set_message(t('Installment is not allowed') . "<br>" . uc_wirecard_checkout_page_installment_allowed($order),
             'error');
         drupal_goto('cart/checkout');
