@@ -566,32 +566,26 @@ function uc_wirecard_checkout_page($op, &$order)
     }
 }
 
-function uc_wirecard_checkout_page_form($form, &$form_state, $order) {
+function uc_wirecard_checkout_page_form($form, &$form_state, $order)
+{
 
-  if ($order->payment_method == 'uc_wcp_invoice' && !uc_wirecard_checkout_page_invoice_allowed($order)) {
-    drupal_set_message(t('Invoice is not allowed'), 'error');
-    drupal_goto('cart/checkout');
-    // alertnatively display error on cart/review
-    //return array('success' => FALSE);
-  }
+    if ($order->payment_method == 'uc_wcp_invoice' && uc_wirecard_checkout_page_invoice_allowed($order) !== true) {
+        drupal_set_message(t('Invoice is not allowed') . "<br>" . uc_wirecard_checkout_page_invoice_allowed($order),
+            'error');
+        drupal_goto('cart/checkout');
+    }
 
-  if ($order->payment_method == 'uc_wcp_installment' && !uc_wirecard_checkout_page_installment_allowed($order)) {
-    drupal_set_message(t('Installment is not allowed'), 'error');
-    drupal_goto('cart/checkout');
-    // alertnatively display error on cart/review
-    //return array('success' => FALSE);
-  }
+    if ($order->payment_method == 'uc_wcp_installment' && !uc_wirecard_checkout_page_installment_allowed($order) !== true) {
+        drupal_set_message(t('Installment is not allowed') . "<br>" . uc_wirecard_checkout_page_installment_allowed($order),
+            'error');
+        drupal_goto('cart/checkout');
+    }
 
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit Orders')
-  );
-
-  if (variable_get('uc_wirecard_checkout_page_use_iframe')) {
-    $form['#action'] = url('cart/wirecard_checkout_page/iframe');
-    return $form;
-  }
+    $form['actions'] = array('#type' => 'actions');
+    $form['actions']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Submit Orders')
+    );
 
   try {
     $client = uc_wirecard_checkout_page_initiate_payment($order);
@@ -658,47 +652,95 @@ function uc_wirecard_checkout_page_menu() {
  *
  * @return bool
  */
-function uc_wirecard_checkout_page_invoice_allowed($order) {
+function uc_wirecard_checkout_page_invoice_allowed($order)
+{
 
-  if ($order->currency != 'EUR') {
-    return FALSE;
-  }
+    if (strpos(variable_get('uc_wirecard_checkout_page_invoice_accepted_currencies', 'EUR'), $order->currency) === false
+    ) {
+        return t('Currency not allowed: ') . $order->currency;
+    }
 
-  $fields = array('country', 'first_name', 'last_name', 'street1', 'street2', 'city', 'postal_code', 'zone');
-  foreach ($fields as $f) {
-    $bf = "billing_$f";
-    $df = "delivery_$f";
-    if ($order->$bf != $order->$df) {
-      return FALSE;
+    if (intval(variable_get('uc_wirecard_checkout_page_invoice_min_amount', 10)) > $order->order_total) {
+        return t('Minimum order total not reached: ') . intval(variable_get('uc_wirecard_checkout_page_invoice_min_amount',
+            10));
+    }
+
+    if (intval(variable_get('uc_wirecard_checkout_page_invoice_max_amount', 3500)) < $order->order_total) {
+        return t('Maximum order total exceeded: ') . intval(variable_get('uc_wirecard_checkout_page_invoice_max_amount',
+            3500));
     }
   }
 
-  return TRUE;
+    $fields = array(
+        'country',
+        'first_name',
+        'last_name',
+        'street1',
+        'street2',
+        'city',
+        'postal_code',
+        'zone'
+    );
+    if (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'payolution' && variable_get('uc_wirecard_checkout_page_addresses_equal') === true) {
+        foreach ($fields as $f) {
+            $bf = "billing_$f";
+            $df = "delivery_$f";
+            if ($order->$bf != $order->$df) {
+                return t('Billing and shipping addresses must be identical.');
+            }
+        }
+    }
+
+    return true;
 }
 
 /**
  * check whether installment is allowed
  *
- * @param $order
+ * @param UcOrder $order
  *
  * @return bool
  */
-function uc_wirecard_checkout_page_installment_allowed($order) {
+function uc_wirecard_checkout_page_installment_allowed($order)
+{
+    $min_amount = intval(variable_get('uc_wirecard_checkout_page_installment_min_amount', 150));
+    $max_amount = intval(variable_get('uc_wirecard_checkout_page_installment_max_amount', 3500));
+    if (strpos(variable_get('uc_wirecard_checkout_page_installment_accepted_currencies'),
+            $order->currency) === false
+    ) {
+        return t('Currency not allowed: ') . $order->currency;
+    }
 
-  if ($order->currency != 'EUR') {
-    return FALSE;
-  }
+    if ($order->order_total < $min_amount) {
+        return t('Minimum order total not reached: ') . uc_currency_format($min_amount);
+    }
 
-  $fields = array('country', 'first_name', 'last_name', 'street1', 'street2', 'city', 'postal_code', 'zone');
-  foreach ($fields as $f) {
-    $bf = "billing_$f";
-    $df = "delivery_$f";
-    if ($order->$bf != $order->$df) {
-      return FALSE;
+    if ($order->order_total > $max_amount) {
+        return t('Maximum order total exceeded: ') . $max_amount;
+    }
+
+    $fields = array(
+        'country',
+        'first_name',
+        'last_name',
+        'street1',
+        'street2',
+        'city',
+        'postal_code',
+        'zone'
+    );
+    if (variable_get('uc_wirecard_checkout_page_installment_provider') == 'payolution' && variable_get('uc_wirecard_checkout_page_addresses_equal') === true) {
+        foreach ($fields as $f) {
+            $bf = "billing_$f";
+            $df = "delivery_$f";
+            if ($order->$bf != $order->$df) {
+                return t('Billing and shipping addresses must be identical.');
+            }
+        }
     }
   }
 
-  return TRUE;
+    return true;
 }
 
 /**
