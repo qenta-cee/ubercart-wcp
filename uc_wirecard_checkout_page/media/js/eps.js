@@ -1,5 +1,3 @@
-<?php
-
 /**
  * Shop System Plugins - Terms of Use
  *
@@ -35,41 +33,11 @@
  * terms of use!
  */
 
-class Partial
-{
-    /**
-     * Add styles and scripts to runtime as well as generate html for invoice
-     *
-     * @return mixed
-     */
-    static function invoice(){
-        drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/invoice.css');
-        drupal_add_library('system', 'ui.datepicker');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/invoice.js');
-        return include "invoice.php";
-    }
-
-    /**
-     * Add styles and scripts to runtime as well as generate html for installment
-     *
-     * @return mixed
-     */
-    static function installment(){
-        drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/installment.css');
-        drupal_add_library('system', 'ui.datepicker');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/installment.js');
-        return include "installment.php";
-    }
-
-    static function ideal(){
-        drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/ideal.css');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/ideal.js');
-        return include "ideal.php";
-    }
-
-    static function eps(){
-        drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/eps.css');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/eps.js');
-        return include "eps.php";
-    }
-}
+$ = jQuery;
+$(document).ready(function() {
+    var institutions = $.parseJSON($("#wcp_eps_institutions").html());
+    $("#wcp_eps_financialInstitution").wrap('<label>').append("<select name='epsFinancialInstitution'></select>");
+    $.each(institutions,function(a,b){
+        $("#wcp_eps_financialInstitution").find('select').append('<option value="'+a+'">'+b+'</option>');
+    });
+});
