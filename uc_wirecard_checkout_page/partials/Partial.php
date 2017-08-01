@@ -61,12 +61,22 @@ class Partial
         return include "installment.php";
     }
 
+    /**
+     * Add styles and scripts to runtime as well as generate dropdowns for ideal financialInstitution
+     *
+     * @return mixed
+     */
     static function ideal(){
         drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/ideal.css');
         drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/ideal.js');
         return include "ideal.php";
     }
 
+    /**
+     * Add styles and scripts to runtime as well as generate dropdowns for eps financialInstitution
+     *
+     * @return mixed
+     */
     static function eps(){
         drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/eps.css');
         drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/eps.js');

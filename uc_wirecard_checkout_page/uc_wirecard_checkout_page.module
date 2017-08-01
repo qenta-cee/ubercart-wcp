@@ -122,6 +122,16 @@ function uc_wirecard_checkout_page_uc_payment_method()
         'checkout' => true,
     );
     $methods[] = array(
+        'id' => 'uc_wcp_masterpass',
+        'name' => t('Wirecard Checkout Page Masterpass'),
+        'title' => t('Wirecard Checkout Page Masterpass'),
+        'desc' => t('Wirecard Checkout Page Masterpass'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 115,
+        'checkout' => true,
+    );
+    $methods[] = array(
         'id' => 'uc_wcp_ccard-moto',
         'name' => t('Wirecard Checkout Page Credit Card MoTo'),
         'title' => t('Wirecard Checkout Page Credit Card MoTo'),
@@ -821,16 +831,18 @@ function uc_wirecard_checkout_page_initiate_payment($order)
         ->setDuplicateRequestCheck(false)
         ->setMaxRetries(variable_get('uc_wirecard_checkout_page_max_retries'))
         ->setAutoDeposit(variable_get('uc_wirecard_checkout_page_auto_deposit'))
-        ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME)->createConsumerMerchantCrmId($user->mail);
+        ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME)
+        ->createConsumerMerchantCrmId($user->mail)
+        ->setShippingProfile('NO_SHIPPING');
 
-    if(isset($_SESSION['wcp_additional'])){
-        foreach($_SESSION['wcp_additional'] as $method=>$value) {
+    if (isset($_SESSION['wcp_additional'])) {
+        foreach ($_SESSION['wcp_additional'] as $method => $value) {
             $client->{"set$method"}($value);
         }
+        unset($_SESSION['wcp_additional']);
     }
     $client->ubercartOrderId = $order->order_id;
     $client->ubercartCartId = uc_cart_get_id();
-
     return $client;
 }
 
