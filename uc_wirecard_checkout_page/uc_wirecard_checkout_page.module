@@ -104,8 +104,10 @@ function uc_wirecard_checkout_page_uc_payment_method()
     $image = function ($type) {
         global $base_url;
         return theme_image(array(
-            'path' => $base_url . '/' . drupal_get_path('module','uc_wirecard_checkout_page') . '/media/img/' . $type . '.png',
-            'height' => 20
+            'path' => $base_url . '/' . drupal_get_path('module',
+                    'uc_wirecard_checkout_page') . '/media/img/' . $type . '.png',
+            'height' => 20,
+            'attributes' => array()
         ));
     };
 
