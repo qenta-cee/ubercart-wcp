@@ -781,22 +781,6 @@ function uc_wirecard_checkout_page_initiate_payment($order)
         'LANGUAGE' => $language->language
     ));
 
-    $consumerData = new WirecardCEE_Stdlib_ConsumerData();
-    $consumerData->setUserAgent($_SERVER['HTTP_USER_AGENT'])
-        ->setIpAddress($_SERVER['REMOTE_ADDR']);
-
-    if (variable_get('uc_wirecard_checkout_page_send_additional_data') || in_array(
-            $paymenttype,
-            Array(
-                WirecardCEE_QPay_PaymentType::INVOICE,
-                WirecardCEE_QPay_PaymentType::INSTALLMENT
-            )
-        )
-    ) {
-        uc_wirecard_checkout_page_set_consumer_information($order,
-            $consumerData);
-    }
-
     $returnUrl = url('cart/wirecard_checkout_page/return',
         array('absolute' => true));
     $confirmUrl = url('cart/wirecard_checkout_page/confirm',
@@ -824,7 +808,6 @@ function uc_wirecard_checkout_page_initiate_payment($order)
         ->setConfirmUrl($confirmUrl)
         ->setServiceUrl(variable_get('uc_wirecard_checkout_page_service_url'))
         ->setImageUrl(variable_get('uc_wirecard_checkout_page_image_url'))
-        ->setConsumerData($consumerData)
         ->setDisplayText(variable_get('uc_wirecard_checkout_page_display_text'))
         ->setCustomerStatement(sprintf('%s #%06s',
             variable_get('uc_store_name'), $order->order_id))
@@ -834,6 +817,9 @@ function uc_wirecard_checkout_page_initiate_payment($order)
         ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME)
         ->createConsumerMerchantCrmId($user->mail)
         ->setShippingProfile('NO_SHIPPING');
+
+    uc_wirecard_checkout_page_setConsumerData($client, $paymenttype, $order);
+    uc_wirecard_checkout_page_setBasketInformation($client, $paymenttype, $order);
 
     if (isset($_SESSION['wcp_additional'])) {
         foreach ($_SESSION['wcp_additional'] as $method => $value) {
@@ -846,32 +832,38 @@ function uc_wirecard_checkout_page_initiate_payment($order)
     return $client;
 }
 
-
 /**
- * Set additional consumer information
- *
- * @param $order
- * @param WirecardCEE_Stdlib_ConsumerData $consumerData
+ * @param WirecardCEE_QPay_FrontendClient $client
+ * @param $paymenttype
+ * @param UcOrder $order
  */
-function uc_wirecard_checkout_page_set_consumer_information(
-    $order,
-    WirecardCEE_Stdlib_ConsumerData $consumerData
-) {
+function uc_wirecard_checkout_page_setConsumerData(&$client, $paymenttype, $order)
+{
+    global $user;
 
-    $user = user_load($order->uid);
+    $force_shipping_data = variable_get('uc_wirecard_checkout_page_send_shipping_data', true)
+        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
+        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
 
-    if (property_exists($user, 'field_birthdate')) {
-        $birthdate = $user->field_birthdate['und'][0]['value'];
-        $consumerData->setBirthDate(new DateTime($birthdate));
-    }
+    $force_additional_data = variable_get('uc_wirecard_checkout_page_send_additional_data', true)
+        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
+        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
 
-    $consumerData->setEmail($order->primary_email);
+    $consumer_data = new WirecardCEE_Stdlib_ConsumerData();
+    $consumer_data->setUserAgent($_SERVER['HTTP_USER_AGENT'])
+        ->setIpAddress(uc_wirecard_checkout_page_get_client_ip());
 
     $billingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_BILLING);
 
     $billing_country = uc_get_country_data(array('country_id' => $order->billing_country));
     $billing_country = array_pop($billing_country);
     $billing_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
+    // for US/CA statecode (2 chars)
+    if ($billing_country['country_iso_code_2'] == 'US' || $billing_country['country_iso_code_2'] == 'CA') {
+        $billingAddress->setState($billing_zone->zone_code);
+    } else {
+        $billingAddress->setState($billing_zone->zone_name);
+    }
 
     $billingAddress->setFirstname($order->billing_first_name)
         ->setLastname($order->billing_last_name)
@@ -882,35 +874,99 @@ function uc_wirecard_checkout_page_set_consumer_information(
         ->setCountry($billing_country['country_iso_code_2'])
         ->setPhone($order->billing_phone);
 
-    // for US/CA statecode (2 chars)
-    if ($billing_country['country_iso_code_2'] == 'US' || $billing_country['country_iso_code_2'] == 'CA') {
-        $billingAddress->setState($billing_zone->zone_code);
-    } else {
-        $billingAddress->setState($billing_zone->zone_name);
+    $consumer_data->addAddressInformation($billingAddress);
+
+    if ($force_additional_data) {
+        $consumer_data->setEmail($user->mail);
+        if (property_exists($user, 'field_birthdate')) {
+            $birthdate = $user->field_birthdate['und'][0]['value'];
+            $consumer_data->setBirthDate(new DateTime($birthdate));
+        }
     }
 
-    $shippingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_SHIPPING);
+    if ($force_shipping_data) {
+        $shippingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_SHIPPING);
+        $shipping_country = uc_get_country_data(array('country_id' => $order->delivery_country));
+        $shipping_country = array_pop($shipping_country);
+        $shipping_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
 
-    $shipping_country = uc_get_country_data(array('country_id' => $order->delivery_country));
-    $shipping_country = array_pop($shipping_country);
-    $shipping_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
-
-    $shippingAddress->setFirstname($order->delivery_first_name)
-        ->setLastname($order->delivery_last_name)
-        ->setAddress1($order->delivery_street1)
-        ->setAddress2($order->delivery_street2)
-        ->setCity($order->delivery_city)
-        ->setZipCode($order->delivery_postal_code)
-        ->setCountry($shipping_country['country_iso_code_2']);
-
-    // for US/CA statecode (2 chars)
-    if ($shipping_country['country_iso_code_2'] == 'US' || $shipping_country['country_iso_code_2'] == 'CA') {
-        $shippingAddress->setState($shipping_zone->zone_code);
-    } else {
-        $shippingAddress->setState($shipping_zone->zone_name);
+        $shippingAddress->setFirstname($order->delivery_first_name)
+            ->setLastname($order->delivery_last_name)
+            ->setAddress1($order->delivery_street1)
+            ->setAddress2($order->delivery_street2)
+            ->setCity($order->delivery_city)
+            ->setZipCode($order->delivery_postal_code)
+            ->setCountry($shipping_country['country_iso_code_2']);
+        if ($shipping_country['country_iso_code_2'] == 'US' || $shipping_country['country_iso_code_2'] == 'CA') {
+            $shippingAddress->setState($shipping_zone->zone_code);
+        } else {
+            $shippingAddress->setState($shipping_zone->zone_name);
+        }
+        $consumer_data->addAddressInformation($shippingAddress);
     }
+    $client->setConsumerData($consumer_data);
+}
 
-    $consumerData->addAddressInformation($billingAddress)
-        ->addAddressInformation($shippingAddress);
+/**
+ * @param WirecardCEE_QPay_FrontendClient $client
+ * @param $paymenttype
+ * @param UcOrder $order
+ */
+function uc_wirecard_checkout_page_setBasketInformation(&$client, $paymenttype, $order)
+{
+    $basket = new WirecardCEE_Stdlib_Basket();
+    $force_basket = variable_get('uc_wirecard_checkout_page_send_basket_data', true)
+        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
+        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
 
+    if ($force_basket) {
+        $tax = 0;
+
+        if (property_exists($order, 'line_items')) {
+            foreach ($order->line_items as $line_item) {
+                if ($line_item['type'] == 'tax') {
+                    $tax = $line_item['data']['tax'];
+                }
+            }
+            foreach ($order->line_items as $line_item) {
+                if ($line_item['type'] == 'shipping') {
+                    $shipping_basket_item = new WirecardCEE_Stdlib_Basket_Item('shipping');
+                    $taxable = in_array($line_item['type'], $tax->taxed_line_items);
+                    $shipping_basket_item->setName('Shipping')
+                        ->setUnitNetAmount(number_format($line_item['amount'], 2))
+                        ->setUnitGrossAmount($taxable ? $line_item['amount'] * ($tax->rate + 1) : $line_item['amount'])
+                        ->setUnitTaxAmount($taxable ? $line_item['amount'] * (1 + $tax->rate) - $line_item['amount'] : 0)
+                        ->setUnitTaxRate($taxable ? $tax->rate * 100 : 0);
+
+                    $basket->addItem($shipping_basket_item);
+                }
+            }
+        }
+        foreach ($order->products as $product) {
+            $basket_item = new WirecardCEE_Stdlib_Basket_Item($product->nid);
+
+            $basket_item->setName($product->title)
+                ->setUnitNetAmount(number_format($product->price, 2))
+                ->setUnitGrossAmount($product->price * ($tax->rate + 1))
+                ->setUnitTaxAmount($product->price * (1 + $tax->rate) - $product->price)
+                ->setUnitTaxRate($tax->rate * 100);
+
+            $basket->addItem($basket_item, $product->qty);
+        }
+
+        $client->setBasket($basket);
+    }
+}
+
+function uc_wirecard_checkout_page_get_client_ip()
+{
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR']) {
+        if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',')) {
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return $ips[0];
+        } else {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+    }
+    return $_SERVER['REMOTE_ADDR'];
 }
