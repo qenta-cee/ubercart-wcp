@@ -266,7 +266,9 @@ function uc_wirecard_checkout_page_return() {
 
   // order completion is allowed
   if ($redirect == 'cart/checkout/complete') {
-    $_SESSION['uc_checkout'][$_SESSION['cart_order']]['do_complete'] = TRUE;
+      if (isset($_SESSION['cart_order'])) {
+          $_SESSION['uc_checkout'][$_SESSION['cart_order']]['do_complete'] = true;
+      }
   }
 
   drupal_goto($redirect);
@@ -309,4 +311,12 @@ function uc_wirecard_checkout_page_iframe() {
   }
 
 
+}
+
+
+/**
+ * store additional data during checkout
+ */
+function uc_wirecard_checkout_page_store_additional_data(){
+    $_SESSION['wcp_additional'] = $_POST;
 }

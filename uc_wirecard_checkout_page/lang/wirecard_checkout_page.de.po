@@ -120,100 +120,88 @@ msgid "Wirecard Checkout Page Select"
 msgstr ""
 
 #: uc_wirecard_checkout_page.module:80;81;82
-msgid "Wirecard Checkout Page Credit Card"
-msgstr "Wirecard Checkout Page Kreditkarte"
+msgid "Credit Card"
+msgstr "Kreditkarte"
+
+msgid "Masterpass"
+msgstr "Masterpass"
 
 #: uc_wirecard_checkout_page.module:90;91;92
-msgid "Wirecard Checkout Page Credit Card MoTo"
-msgstr "Wirecard Checkout Page Kreditkarte Moto"
+msgid "Credit Card - Mail order / Telephone order"
+msgstr "Kreditkarte - Post / Telefonbestellung"
 
 #: uc_wirecard_checkout_page.module:100;101;102
-msgid "Wirecard Checkout Page Maestro SecureCode"
-msgstr "Wirecard Checkout Page Maestro SecureCode"
+msgid "Maestro SecureCode"
+msgstr "Maestro SecureCode"
 
 #: uc_wirecard_checkout_page.module:110;111;112
-msgid "Wirecard Checkout Page eps Online Bank Transfer"
-msgstr "Wirecard Checkout Page eps Online-Überweisung"
+msgid "eps Online Bank Transfer"
+msgstr "eps-Überweisung"
 
 #: uc_wirecard_checkout_page.module:120;121;122
-msgid "Wirecard Checkout Page iDEAL"
-msgstr "Wirecard Checkout Page iDEAL"
+msgid "iDEAL"
+msgstr "iDEAL"
 
 #: uc_wirecard_checkout_page.module:130;131;132
-msgid "Wirecard Checkout Page giropay"
-msgstr "Wirecard Checkout Page giropay"
+msgid "giropay"
+msgstr "giropay"
 
 #: uc_wirecard_checkout_page.module:140;141;142
-msgid "Wirecard Checkout Page SOFORT banking (PIN/TAN)"
-msgstr "Wirecard Checkout Page SOFORT Überweisung (PIN/TAN)"
+msgid "SOFORT"
+msgstr "SOFORT Überweisung"
 
 #: uc_wirecard_checkout_page.module:150;151;152
-msgid "Wirecard Checkout Page Mobile Phone Invoicing"
-msgstr "Wirecard Checkout Page Handyabrechnung"
+msgid "paybox"
+msgstr "paybox"
 
 #: uc_wirecard_checkout_page.module:160;161;162
-msgid "Wirecard Checkout Page paysafecard"
-msgstr "Wirecard Checkout Page paysafecard"
+msgid "paysafecard"
+msgstr "paysafecard"
 
 #: uc_wirecard_checkout_page.module:170;171;172
-msgid "Wirecard Checkout Page @QUICK"
-msgstr "Wirecard Checkout Page @QUICK"
+msgid "@QUICK"
+msgstr "@QUICK"
 
 #: uc_wirecard_checkout_page.module:180;181;182
-msgid "Wirecard Checkout Page PayPal"
-msgstr "Wirecard Checkout Page PayPal"
+msgid "PayPal"
+msgstr "PayPal"
 
-#: uc_wirecard_checkout_page.module:190;191;192
-msgid "Wirecard Checkout Page Direct Debit"
-msgstr "Wirecard Checkout Page Lastschriftverfahren"
-
-#: uc_wirecard_checkout_page.module:200;201;202
-msgid "Wirecard Checkout Page CLICK2PAY"
-msgstr "Wirecard Checkout Page CLICK2PAY"
 
 #: uc_wirecard_checkout_page.module:210;211;212
-msgid "Wirecard Checkout Page Invoice"
-msgstr "Wirecard Checkout Page Rechnung"
+msgid "Invoice"
+msgstr "Kauf auf Rechnung"
 
 #: uc_wirecard_checkout_page.module:220;221;222
-msgid "Wirecard Checkout Page Installment"
-msgstr "Wirecard Checkout Page Ratenzahlung"
+msgid "Installment"
+msgstr "Kauf auf Raten"
 
 #: uc_wirecard_checkout_page.module:230;231;232
-msgid "Wirecard Checkout Page Bancontact/Mister Cash"
-msgstr "Wirecard Checkout Page Bancontact/Mister Cash"
+msgid "Bancontact"
+msgstr "Bancontact"
 
 #: uc_wirecard_checkout_page.module:240;241;242
-msgid "Wirecard Checkout Page Przelewy24"
-msgstr "Wirecard Checkout Page Przelewy24"
+msgid "Przelewy24"
+msgstr "Przelewy24"
 
 #: uc_wirecard_checkout_page.module:250;251;252
-msgid "Wirecard Checkout Page moneta.ru"
-msgstr "Wirecard Checkout Page moneta.ru"
+msgid "moneta.ru"
+msgstr "moneta.ru"
 
 #: uc_wirecard_checkout_page.module:260;261;262
-msgid "Wirecard Checkout Page POLi"
-msgstr "Wirecard Checkout Page POLi"
+msgid "POLi"
+msgstr "POLi"
 
 #: uc_wirecard_checkout_page.module:270;271;272
-msgid "Wirecard Checkout Page eKonto"
-msgstr "Wirecard Checkout Page eKonto"
+msgid "eKonto"
+msgstr "eKonto"
 
 #: uc_wirecard_checkout_page.module:280;281;282
-msgid "Wirecard Checkout Page InstantBank"
-msgstr "Wirecard Checkout Page InstantBank"
-
-#: uc_wirecard_checkout_page.module:290;291;292
-msgid "Wirecard Checkout Page mpass"
-msgstr "Wirecard Checkout Page mpass"
-
-#: uc_wirecard_checkout_page.module:300;301;302
-msgid "Wirecard Checkout Page Skrill Direct"
-msgstr "Wirecard Checkout Page Skrill Direct"
+msgid "Trustly"
+msgstr "Trustly"
 
 #: uc_wirecard_checkout_page.module:311;312
-msgid "Wirecard Checkout Page Skrill Digital Wallet"
-msgstr "Wirecard Checkout Page Skrill Digital Wallet"
+msgid "Skrill Digital Wallet"
+msgstr "Skrill Digital Wallet"
 
 #: uc_wirecard_checkout_page.module:339;345
 msgid "Customer Id"
@@ -317,3 +305,27 @@ msgstr "Ubercart Wirecard Checkout Page Payment Gateway"
 #: uc_wirecard_checkout_page.info:0
 msgid "Ubercart - payment"
 msgstr "Ubercart - payment"
+
+msgid "I agree that the data which are necessary for the liquidation of installments and which are used to complete the identity and credit check are transmitted to payolution.  My __consent__ can be revoked at any time with future effect."
+msgstr "Mit der Übermittlung der für die Abwicklung des Ratenkaufes und einer Identitäts- und Bonitätsprüfung erforderlichen Daten an payolution bin ich einverstanden. Meine __Einwilligung__ kann ich jederzeit mit Wirkung für die Zukunft widerrufen."
+
+msgid "Birthday"
+msgstr "Geburtsdatum"
+
+msgid "You have to be 18 years or older to use this payment."
+msgstr "Sie müssen 18 Jahre oder älter sein, um diese Zahlungsart verwenden zu dürfen."
+
+msgid "Consumer must accept payolution terms during the checkout process."
+msgstr "Kunden müssen die Nutzungsbedingungen von payolution während des Bezahlprozesses akzeptieren."
+
+msgid "Financial institution"
+msgstr "Finanzinstitut"
+
+msgid "Minimum order total not reached: "
+msgstr "Minimaler Bestellwert nicht erreicht: "
+
+msgid "Maximum order total exceeded: "
+msgstr "Maximaler Bestellwert überschritten: "
+
+msgid "Currency not allowed: "
+msgstr "Währung nicht erlaubt: "

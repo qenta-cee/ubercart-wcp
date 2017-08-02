@@ -1,17 +1,37 @@
 <?php
-/*
- * Shop System Plugins - Terms of use
+/**
+ * Shop System Plugins - Terms of Use
  *
- * This terms of use regulates warranty and liability between Wirecard Central Eastern Europe (subsequently referred to as WDCEE) and it's
- * contractual partners (subsequently referred to as customer or customers) which are related to the use of plugins provided by WDCEE.
+ * The plugins offered are provided free of charge by Wirecard Central Eastern
+ * Europe GmbH
+ * (abbreviated to Wirecard CEE) and are explicitly not part of the Wirecard
+ * CEE range of products and services.
  *
- * The Plugin is provided by WDCEE free of charge for it's customers and must be used for the purpose of WDCEE's payment platform
- * integration only. It explicitly is not part of the general contract between WDCEE and it's customer. The plugin has successfully been tested
- * under specific circumstances which are defined as the shopsystem's standard configuration (vendor's delivery state). The Customer is
- * responsible for testing the plugin's functionality before putting it into production enviroment.
- * The customer uses the plugin at own risk. WDCEE does not guarantee it's full functionality neither does WDCEE assume liability for any
- * disadvantage related to the use of this plugin. By installing the plugin into the shopsystem the customer agrees to the terms of use.
- * Please do not use this plugin if you do not agree to the terms of use!
+ * They have been tested and approved for full functionality in the standard
+ * configuration
+ * (status on delivery) of the corresponding shop system. They are under
+ * General Public License Version 2 (GPLv2) and can be used, developed and
+ * passed on to third parties under the same terms.
+ *
+ * However, Wirecard CEE does not provide any guarantee or accept any liability
+ * for any errors occurring when used in an enhanced, customized shop system
+ * configuration.
+ *
+ * Operation in an enhanced, customized configuration is at your own risk and
+ * requires a comprehensive test phase by the user of the plugin.
+ *
+ * Customers use the plugins at their own risk. Wirecard CEE does not guarantee
+ * their full functionality neither does Wirecard CEE assume liability for any
+ * disadvantages related to the use of the plugins. Additionally, Wirecard CEE
+ * does not guarantee the full functionality for customized shop systems or
+ * installed plugins of other vendors of plugins within the same shop system.
+ *
+ * Customers are responsible for testing the plugin's functionality before
+ * starting productive operation.
+ *
+ * By installing the plugin into the shop system the customer agrees to these
+ * terms of use. Please do not use the plugin if you do not agree to these
+ * terms of use!
  */
 
 /**
@@ -21,15 +41,13 @@
  */
 
 define('UC_WIRECARD_CHECKOUT_PAGE_NAME', 'Uebercart35_WirecardCheckoutPage');
-define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.1.0');
+define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.0');
 define('UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME', 'WirecardCheckoutPageFrame');
-define('UC_WIRECARD_CHECKOUT_PAGE_INVOICE_INSTALLMENT_MIN_AGE', 18);
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname(__FILE__) . '/library');
 
-require_once 'Zend/Loader/Autoloader.php';
-Zend_Loader_Autoloader::getInstance()->registerNamespace("WirecardCEE");
-
+require_once 'autoload.php';
+require_once 'partials/Partial.php';
 
 /**
  * Implements hook_help.
@@ -44,14 +62,15 @@ Zend_Loader_Autoloader::getInstance()->registerNamespace("WirecardCEE");
  * @return string
  */
 
-function uc_wirecard_checkout_page_help($path, $arg) {
-  switch ($path) {
-    case "admin/help#uc_wirecard_checkout_page":
-      return '<p>' . t(
-        'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
-      ) . '</p>';
-      break;
-  }
+function uc_wirecard_checkout_page_help($path, $arg)
+{
+    switch ($path) {
+        case "admin/help#uc_wirecard_checkout_page":
+            return '<p>' . t(
+                'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
+            ) . '</p>';
+            break;
+    }
 }
 
 /**
@@ -59,14 +78,15 @@ function uc_wirecard_checkout_page_help($path, $arg) {
  *
  * @return mixed
  */
-function uc_wirecard_checkout_page_uc_payment_gateway() {
-  $gateways['uc_wirecard_checkout_page'] = array(
-    'title' => t('Wirecard Checkout Page'),
-    'description' => t(
-      'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
-    ),
-  );
-  return $gateways;
+function uc_wirecard_checkout_page_uc_payment_gateway()
+{
+    $gateways['uc_wirecard_checkout_page'] = array(
+        'title' => t('Wirecard Checkout Page'),
+        'description' => t(
+            'Wirecard CEE is a popular payment service provider (PSP) and has connections with over 20 national and international currencies.'
+        ),
+    );
+    return $gateways;
 }
 
 /**
@@ -78,259 +98,241 @@ function uc_wirecard_checkout_page_uc_payment_gateway() {
  *
  * @return array
  */
-function uc_wirecard_checkout_page_uc_payment_method() {
-  $methods[] = array(
-    'id' => 'uc_wcp_select',
-    'name' => t('Wirecard Checkout Page Select'),
-    'title' => t('Wirecard Checkout Page Select'),
-    'desc' => t('Wirecard Checkout Page Select'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 100,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_ccard',
-    'name' => t('Wirecard Checkout Page Credit Card'),
-    'title' => t('Wirecard Checkout Page Credit Card'),
-    'desc' => t('Wirecard Checkout Page Credit Card'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 110,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_ccard-moto',
-    'name' => t('Wirecard Checkout Page Credit Card MoTo'),
-    'title' => t('Wirecard Checkout Page Credit Card MoTo'),
-    'desc' => t('Wirecard Checkout Page Credit Card MoTo'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 120,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_maestro',
-    'name' => t('Wirecard Checkout Page Maestro SecureCode'),
-    'title' => t('Wirecard Checkout Page Maestro SecureCode'),
-    'desc' => t('Wirecard Checkout Page Maestro SecureCode'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 130,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_eps',
-    'name' => t('Wirecard Checkout Page eps Online Bank Transfer'),
-    'title' => t('Wirecard Checkout Page eps Online Bank Transfer'),
-    'desc' => t('Wirecard Checkout Page eps Online Bank Transfer'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 140,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_idl',
-    'name' => t('Wirecard Checkout Page iDEAL'),
-    'title' => t('Wirecard Checkout Page iDEAL'),
-    'desc' => t('Wirecard Checkout Page iDEAL'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 150,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_giropay',
-    'name' => t('Wirecard Checkout Page giropay'),
-    'title' => t('Wirecard Checkout Page giropay'),
-    'desc' => t('Wirecard Checkout Page giropay'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 160,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_sofortueberweisung',
-    'name' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-    'title' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-    'desc' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 170,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_pbx',
-    'name' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
-    'title' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
-    'desc' => t('Wirecard Checkout Page Mobile Phone Invoicing'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 180,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_psc',
-    'name' => t('Wirecard Checkout Page paysafecard'),
-    'title' => t('Wirecard Checkout Page paysafecard'),
-    'desc' => t('Wirecard Checkout Page paysafecard'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 190,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_quick',
-    'name' => t('Wirecard Checkout Page @QUICK'),
-    'title' => t('Wirecard Checkout Page @QUICK'),
-    'desc' => t('Wirecard Checkout Page @QUICK'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 200,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_paypal',
-    'name' => t('Wirecard Checkout Page PayPal'),
-    'title' => t('Wirecard Checkout Page PayPal'),
-    'desc' => t('Wirecard Checkout Page PayPal'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 210,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_elv',
-    'name' => t('Wirecard Checkout Page Direct Debit'),
-    'title' => t('Wirecard Checkout Page Direct Debit'),
-    'desc' => t('Wirecard Checkout Page Direct Debit'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 220,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_c2p',
-    'name' => t('Wirecard Checkout Page CLICK2PAY'),
-    'title' => t('Wirecard Checkout Page CLICK2PAY'),
-    'desc' => t('Wirecard Checkout Page CLICK2PAY'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 230,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_invoice',
-    'name' => t('Wirecard Checkout Page Invoice'),
-    'title' => t('Wirecard Checkout Page Invoice'),
-    'desc' => t('Wirecard Checkout Page Invoice'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 240,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_installment',
-    'name' => t('Wirecard Checkout Page Installment'),
-    'title' => t('Wirecard Checkout Page Installment'),
-    'desc' => t('Wirecard Checkout Page Installment'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 250,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_bancontact_mistercash',
-    'name' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
-    'title' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
-    'desc' => t('Wirecard Checkout Page Bancontact/Mister Cash'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 260,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_przelewy24',
-    'name' => t('Wirecard Checkout Page Przelewy24'),
-    'title' => t('Wirecard Checkout Page Przelewy24'),
-    'desc' => t('Wirecard Checkout Page Przelewy24'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 270,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_moneta',
-    'name' => t('Wirecard Checkout Page moneta.ru'),
-    'title' => t('Wirecard Checkout Page moneta.ru'),
-    'desc' => t('Wirecard Checkout Page moneta.ru'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 280,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_poli',
-    'name' => t('Wirecard Checkout Page POLi'),
-    'title' => t('Wirecard Checkout Page POLi'),
-    'desc' => t('Wirecard Checkout Page POLi'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 290,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_ekonto',
-    'name' => t('Wirecard Checkout Page eKonto'),
-    'title' => t('Wirecard Checkout Page eKonto'),
-    'desc' => t('Wirecard Checkout Page eKonto'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 300,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_instantbank',
-    'name' => t('Wirecard Checkout Page InstantBank'),
-    'title' => t('Wirecard Checkout Page InstantBank'),
-    'desc' => t('Wirecard Checkout Page InstantBank'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 310,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_mpass',
-    'name' => t('Wirecard Checkout Page mpass'),
-    'title' => t('Wirecard Checkout Page mpass'),
-    'desc' => t('Wirecard Checkout Page mpass'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 320,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_skrilldirect',
-    'name' => t('Wirecard Checkout Page Skrill Direct'),
-    'title' => t('Wirecard Checkout Page Skrill Direct'),
-    'desc' => t('Wirecard Checkout Page Skrill Direct'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 330,
-    'checkout' => TRUE,
-  );
-  $methods[] = array(
-    'id' => 'uc_wcp_skrillwallet',
-    'name' => t('Wirecard Checkout Page Skrill Digital Wallet'),
-    'title' => t('Wirecard Checkout Page Skrill Digital Wallet'),
-    'desc' => t('Wirecard Checkout Page Skrill Digital Wallet'),
-    'callback' => 'uc_wirecard_checkout_page',
-    'redirect' => 'uc_wirecard_checkout_page_form',
-    'weight' => 340,
-    'checkout' => TRUE,
-  );
 
-  return $methods;
+function uc_wirecard_checkout_page_uc_payment_method()
+{
+    $image = function ($type) {
+        global $base_url;
+        return theme_image(array(
+            'path' => $base_url . '/' . drupal_get_path('module',
+                    'uc_wirecard_checkout_page') . '/media/img/' . $type . '.png',
+            'height' => 20,
+            'attributes' => array()
+        ));
+    };
+
+    $methods[] = array(
+        'id' => 'uc_wcp_select',
+        'name' => t('Wirecard Checkout Page Select'),
+        'title' => t('Wirecard Checkout Page Select'),
+        'desc' => t('Wirecard Checkout Page Select'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 100,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_ccard',
+        'name' => t('Wirecard Checkout Page Credit Card'),
+        'title' => t('Credit Card') . $image('ccard'),
+        'desc' => t('Wirecard Checkout Page Credit Card'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 110,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_masterpass',
+        'name' => t('Wirecard Checkout Page Masterpass'),
+        'title' => t('Masterpass') . $image('masterpass'),
+        'desc' => t('Wirecard Checkout Page Masterpass'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 115,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_ccard-moto',
+        'name' => t('Wirecard Checkout Page Credit Card MoTo'),
+        'title' => t('Credit Card - Mail order / Telephone order') . $image('ccard-moto'),
+        'desc' => t('Wirecard Checkout Page Credit Card MoTo'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 120,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_maestro',
+        'name' => t('Wirecard Checkout Page Maestro SecureCode'),
+        'title' => t('Maestro SecureCode') . $image('maestro'),
+        'desc' => t('Wirecard Checkout Page Maestro SecureCode'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 130,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_eps',
+        'name' => t('Wirecard Checkout Page eps Online Bank Transfer'),
+        'title' => t('eps Online Bank Transfer') . $image('eps') . Partial::eps(),
+        'desc' => t('Wirecard Checkout Page eps Online Bank Transfer'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 140,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_idl',
+        'name' => t('Wirecard Checkout Page iDEAL'),
+        'title' => t('iDEAL') . $image('idl') . Partial::ideal(),
+        'desc' => t('Wirecard Checkout Page iDEAL'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 150,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_giropay',
+        'name' => t('Wirecard Checkout Page giropay'),
+        'title' => t('giropay') . $image('giropay'),
+        'desc' => t('Wirecard Checkout Page giropay'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 160,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_sofortueberweisung',
+        'name' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
+        'title' => t('SOFORT') . $image('sofortueberweisung'),
+        'desc' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 170,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_pbx',
+        'name' => t('Wirecard Checkout Page paybox'),
+        'title' => t('paybox') . $image('pbx'),
+        'desc' => t('Wirecard Checkout Page paybox'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 180,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_psc',
+        'name' => t('Wirecard Checkout Page paysafecard'),
+        'title' => t('paysafecard') . $image('psc'),
+        'desc' => t('Wirecard Checkout Page paysafecard'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 190,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_quick',
+        'name' => t('Wirecard Checkout Page @QUICK'),
+        'title' => t('@QUICK') . $image('quick'),
+        'desc' => t('Wirecard Checkout Page @QUICK'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 200,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_paypal',
+        'name' => t('Wirecard Checkout Page PayPal'),
+        'title' => t('PayPal') . $image('paypal'),
+        'desc' => t('Wirecard Checkout Page PayPal'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 210,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_invoice',
+        'name' => t('Wirecard Checkout Page Invoice'),
+        'title' => t('Invoice') . $image('invoice') . Partial::invoice(),
+        'desc' => t('Wirecard Checkout Page Invoice'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 240,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_installment',
+        'name' => t('Wirecard Checkout Page Installment'),
+        'title' => t('Installment') . $image('installment') . Partial::installment(),
+        'desc' => t('Wirecard Checkout Page Installment'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 250,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_bancontact_mistercash',
+        'name' => t('Wirecard Checkout Page Bancontact'),
+        'title' => t('Bancontact') . $image('bancontact_mistercash'),
+        'desc' => t('Wirecard Checkout Page Bancontact'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 260,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_przelewy24',
+        'name' => t('Wirecard Checkout Page Przelewy24'),
+        'title' => t('Przelewy24') . $image('przelewy24'),
+        'desc' => t('Wirecard Checkout Page Przelewy24'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 270,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_moneta',
+        'name' => t('Wirecard Checkout Page moneta.ru'),
+        'title' => t('moneta.ru') . $image('moneta'),
+        'desc' => t('Wirecard Checkout Page moneta.ru'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 280,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_poli',
+        'name' => t('Wirecard Checkout Page POLi'),
+        'title' => t('POLi') . $image('poli'),
+        'desc' => t('Wirecard Checkout Page POLi'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 290,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_ekonto',
+        'name' => t('Wirecard Checkout Page eKonto'),
+        'title' => t('eKonto') . $image('ekonto'),
+        'desc' => t('Wirecard Checkout Page eKonto'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 300,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_trustly',
+        'name' => t('Wirecard Checkout Page Trustly'),
+        'title' => t('Trustly') . $image('trustly'),
+        'desc' => t('Wirecard Checkout Page InstantBank'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 310,
+        'checkout' => true,
+    );
+    $methods[] = array(
+        'id' => 'uc_wcp_skrillwallet',
+        'name' => t('Wirecard Checkout Page Skrill Digital Wallet'),
+        'title' => t('Skrill Digital Wallet') . $image('skrillwallet'),
+        'desc' => t('Wirecard Checkout Page Skrill Digital Wallet'),
+        'callback' => 'uc_wirecard_checkout_page',
+        'redirect' => 'uc_wirecard_checkout_page_form',
+        'weight' => 340,
+        'checkout' => true,
+    );
+
+    return $methods;
 }
 
 /**
@@ -341,125 +343,261 @@ function uc_wirecard_checkout_page_uc_payment_method() {
  *
  * @return mixed
  */
-function uc_wirecard_checkout_page($op, &$order) {
+function uc_wirecard_checkout_page($op, &$order)
+{
+    switch ($op) {
+        case 'cart-review':
+            break;
 
-  switch ($op) {
-    case 'cart-review':
-      break;
+        case 'settings':
+            $payment_name = @end(explode("/", $_GET['q']));
+            $form['uc_wirecard_checkout_page_customer_id'] = array(
+                '#type' => 'textfield',
+                '#title' => t('Customer Id'),
+                '#description' => t('Wirecard CEE Customer Id'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_customer_id',
+                    'D200001'),
+            );
+            $form['uc_wirecard_checkout_page_shop_id'] = array(
+                '#type' => 'textfield',
+                '#title' => t('Shop Id'),
+                '#description' => t('Wirecard CEE Shop Id'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_shop_id'),
+            );
+            $form['uc_wirecard_checkout_page_secret'] = array(
+                '#type' => 'textfield',
+                '#title' => t('Secret'),
+                '#description' => t('Wirecard CEE Secret'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_secret',
+                    'B8AKTPWBRMNBV455FG6M2DANE99WU2'),
+            );
+            $form['uc_wirecard_checkout_page_auto_deposit'] = array(
+                '#type' => 'checkbox',
+                '#title' => t('Auto deposit'),
+                '#description' => t('Auto deposit'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_auto_deposit',
+                    false),
+            );
+            $form['uc_wirecard_checkout_page_service_url'] = array(
+                '#type' => 'textfield',
+                '#title' => t('Service Url'),
+                '#description' => t('Backlink on the payment page to your shop, usualy links to contact or imprint page'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_service_url'),
+            );
+            $form['uc_wirecard_checkout_page_image_url'] = array(
+                '#type' => 'textfield',
+                '#title' => t('Image Url'),
+                '#description' => t('Image Url for displaying an image on the payment page (95x65 pixels preferred)'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_image_url'),
+            );
+            $form['uc_wirecard_checkout_page_max_retries'] = array(
+                '#type' => 'textfield',
+                '#title' => t('Max. retries'),
+                '#description' => t('Maximal number of payment retries'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_max_retries',
+                    -1),
+            );
+            $form['uc_wirecard_checkout_page_display_text'] = array(
+                '#type' => 'textfield',
+                '#title' => t('Display Text'),
+                '#description' => t('Display Text on the payment page'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_display_text'),
+            );
+            $form['uc_wirecard_checkout_page_send_additional_data'] = array(
+                '#type' => 'checkbox',
+                '#title' => t('Send consumer data'),
+                '#description' => t('Send consumer information'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_send_additional_data',
+                    false),
+            );
+            $form['uc_wirecard_checkout_page_send_basket_data'] = array(
+                '#type' => 'checkbox',
+                '#title' => t('Forward consumer basket data'),
+                '#description' => t('Forwarding basket data about your consumer to the respective financial service provider.'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_send_basket_data',
+                    true),
+            );
+            $form['uc_wirecard_checkout_page_send_billing_data'] = array(
+                '#type' => 'checkbox',
+                '#title' => t('Forward consumer billing data'),
+                '#description' => t('Forwarding billing data about your consumer to the respective financial service provider.'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_send_billing_data',
+                    true),
+            );
+            $form['uc_wirecard_checkout_page_send_shipping_data'] = array(
+                '#type' => 'checkbox',
+                '#title' => t('Forward consumer shipping data'),
+                '#description' => t('Forwarding shipping data about your consumer to the respective financial service provider.'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_send_shipping_data',
+                    true),
+            );
+            if ($payment_name == 'uc_wcp_installment') {
+                $form['uc_wirecard_checkout_page_installment_provider'] = array(
+                    '#type' => 'select',
+                    '#options' => array(
+                        'payolution' => 'Payolution',
+                        'ratepay' => 'RatePay'
+                    ),
+                    '#title' => t('Installment provider'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_installment_provider',
+                        'payolution'),
+                );
+                $form['uc_wirecard_checkout_page_installment_min_amount'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Minimum amount'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_installment_min_amount',
+                        150),
+                );
+                $form['uc_wirecard_checkout_page_installment_max_amount'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Maximum amount'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_installment_max_amount',
+                        3500),
+                );
+                $form['uc_wirecard_checkout_page_installment_accepted_currencies'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Accepted currencies'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_installment_accepted_currencies',
+                        'EUR'),
+                );
+                $form['uc_wirecard_checkout_page_installment_accepted_billing_countries'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Accepted billing countries'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_installment_accepted_billing_countries',
+                        'AT,DE,CH'),
+                );
+                $form['uc_wirecard_checkout_page_installment_accepted_shipping_countries'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Accepted shipping countries'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_installment_accepted_shipping_countries',
+                        'AT,DE,CH'),
+                );
 
-    case 'settings':
-      $form['uc_wirecard_checkout_page_customer_id'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Customer Id'),
-        '#description' => t('Wirecard CEE Customer Id'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_customer_id', 'D200001'),
-      );
-      $form['uc_wirecard_checkout_page_shop_id'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Shop Id'),
-        '#description' => t('Wirecard CEE Shop Id'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_shop_id'),
-      );
-      $form['uc_wirecard_checkout_page_secret'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Secret'),
-        '#description' => t('Wirecard CEE Secret'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_secret', 'B8AKTPWBRMNBV455FG6M2DANE99WU2'),
-      );
-      $form['uc_wirecard_checkout_page_auto_deposit'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Auto deposit'),
-        '#description' => t('Auto deposit'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_auto_deposit', FALSE),
-      );
-      $form['uc_wirecard_checkout_page_service_url'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Service Url'),
-        '#description' => t('Backlink on the payment page to your shop, usualy links to contact or imprint page'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_service_url'),
-      );
-      $form['uc_wirecard_checkout_page_image_url'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Image Url'),
-        '#description' => t('Image Url for displaying an image on the payment page (95x65 pixels preferred)'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_image_url'),
-      );
-      $form['uc_wirecard_checkout_page_max_retries'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Max. retries'),
-        '#description' => t('Maximal number of payment retries'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_max_retries', -1),
-      );
-      $form['uc_wirecard_checkout_page_display_text'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Display Text'),
-        '#description' => t('Display Text on the payment page'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_display_text'),
-      );
-      $form['uc_wirecard_checkout_page_send_additional_data'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Send additional data'),
-        '#description' => t('Send additional customer information'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_send_additional_data', FALSE),
-      );
-      $form['uc_wirecard_checkout_page_use_iframe'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Use iframe'),
-        '#description' => t('Use iframe'),
-        '#default_value' => variable_get('uc_wirecard_checkout_page_use_iframe', FALSE),
-      );
+            } elseif ($payment_name == 'uc_wcp_invoice') {
+                $form['uc_wirecard_checkout_page_invoice_provider'] = array(
+                    '#type' => 'select',
+                    '#options' => array(
+                        'wirecard' => 'Wirecard',
+                        'payolution' => 'Payolution',
+                        'ratepay' => 'RatePay'
+                    ),
+                    '#title' => t('Invoice provider'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_invoice_provider',
+                        'wirecard'),
+                );
+                $form['uc_wirecard_checkout_page_invoice_min_amount'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Minimum amount'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_invoice_min_amount',
+                        10),
+                );
+                $form['uc_wirecard_checkout_page_invoice_max_amount'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Maximum amount'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_invoice_max_amount',
+                        3500),
+                );
+                $form['uc_wirecard_checkout_page_invoice_accepted_currencies'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Accepted currencies'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_invoice_accepted_currencies',
+                        'EUR'),
+                );
+                $form['uc_wirecard_checkout_page_invoice_accepted_billing_countries'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Accepted billing countries'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_invoice_accepted_billing_countries',
+                        'AT,DE,CH'),
+                );
+                $form['uc_wirecard_checkout_page_invoice_accepted_shipping_countries'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Accepted shipping countries'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_invoice_accepted_shipping_countries',
+                        'AT,DE,CH'),
+                );
+            }
 
-      return $form;
-  }
+            if (in_array($payment_name,
+                array('uc_wcp_invoice', 'uc_wcp_installment'))) {
+                $form['uc_wirecard_checkout_page_payolution_terms'] = array(
+                    '#type' => 'checkbox',
+                    '#title' => t('payolution terms'),
+                    '#description' => t('Consumer must accept payolution terms during the checkout process.'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_payolution_terms',
+                        false),
+                );
+                $form['uc_wirecard_checkout_page_payolution_mid'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Payolution mID'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_payolution_mid',
+                        ''),
+                );
+                $form['uc_wirecard_checkout_page_addresses_equal'] = array(
+                    '#type' => 'checkbox',
+                    '#title' => t('Billing/shipping address must be identical'),
+                    '#description' => t('Only applicable for payolution.'),
+                    '#default_value' => variable_get('uc_wirecard_checkout_page_addresses_equal',
+                        true),
+                );
+            }
+            $form['uc_wirecard_checkout_page_use_iframe'] = array(
+                '#type' => 'checkbox',
+                '#title' => t('Use iframe'),
+                '#description' => t('Use iframe'),
+                '#default_value' => variable_get('uc_wirecard_checkout_page_use_iframe',
+                    false),
+            );
+
+            return $form;
+    }
 }
 
-function uc_wirecard_checkout_page_form($form, &$form_state, $order) {
+function uc_wirecard_checkout_page_form($form, &$form_state, $order)
+{
 
-  if ($order->payment_method == 'uc_wcp_invoice' && !uc_wirecard_checkout_page_invoice_allowed($order)) {
-    drupal_set_message(t('Invoice is not allowed'), 'error');
-    drupal_goto('cart/checkout');
-    // alertnatively display error on cart/review
-    //return array('success' => FALSE);
-  }
-
-  if ($order->payment_method == 'uc_wcp_installment' && !uc_wirecard_checkout_page_installment_allowed($order)) {
-    drupal_set_message(t('Installment is not allowed'), 'error');
-    drupal_goto('cart/checkout');
-    // alertnatively display error on cart/review
-    //return array('success' => FALSE);
-  }
-
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit Orders')
-  );
-
-  if (variable_get('uc_wirecard_checkout_page_use_iframe')) {
-    $form['#action'] = url('cart/wirecard_checkout_page/iframe');
-    return $form;
-  }
-
-  try {
-    $client = uc_wirecard_checkout_page_initiate_payment($order);
-    $response = $client->initiate();
-
-    if ($response->hasFailed()) {
-      watchdog(
-        'Wirecard Checkout Page',
-        "Response failed! Error: @message",
-        array('@message' => $response->getError()->getMessage()),
-        WATCHDOG_ERROR
-      );
-
-      drupal_set_message($response->getError()->getMessage(), 'error');
+    if ($order->payment_method == 'uc_wcp_invoice' && uc_wirecard_checkout_page_invoice_allowed($order) !== true) {
+        drupal_set_message(t('Invoice is not allowed') . "<br>" . uc_wirecard_checkout_page_invoice_allowed($order),
+            'error');
+        drupal_goto('cart/checkout');
     }
-  } catch (Exception $e) {
-    throw($e);
-  }
 
-  $form['#action'] = $response->getRedirectUrl();
-  return $form;
+    if ($order->payment_method == 'uc_wcp_installment' && uc_wirecard_checkout_page_installment_allowed($order) !== true) {
+        drupal_set_message(t('Installment is not allowed') . "<br>" . uc_wirecard_checkout_page_installment_allowed($order),
+            'error');
+        drupal_goto('cart/checkout');
+    }
+
+    $form['actions'] = array('#type' => 'actions');
+    $form['actions']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Submit Orders')
+    );
+
+    if (variable_get('uc_wirecard_checkout_page_use_iframe')) {
+        $form['#action'] = url('cart/wirecard_checkout_page/iframe');
+        return $form;
+    }
+
+    try {
+        $client = uc_wirecard_checkout_page_initiate_payment($order);
+        $response = $client->initiate();
+
+        if ($response->hasFailed()) {
+            watchdog(
+                'Wirecard Checkout Page',
+                "Response failed! Error: @message",
+                array('@message' => $response->getError()->getMessage()),
+                WATCHDOG_ERROR
+            );
+
+            drupal_set_message($response->getError()->getMessage(), 'error');
+        }
+    } catch (Exception $e) {
+        throw($e);
+    }
+
+    $form['#action'] = $response->getRedirectUrl();
+    return $form;
 }
 
 /**
@@ -467,30 +605,38 @@ function uc_wirecard_checkout_page_form($form, &$form_state, $order) {
  *
  * @return mixed
  */
-function uc_wirecard_checkout_page_menu() {
-  $items['cart/wirecard_checkout_page/confirm'] = array(
-    'title' => 'Server2server request payment status',
-    'page callback' => 'uc_wirecard_checkout_page_confirm',
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-    'file' => 'uc_wirecard_checkout_page.pages.inc',
-  );
-  $items['cart/wirecard_checkout_page/return'] = array(
-    'title' => 'Browser return from payment page',
-    'page callback' => 'uc_wirecard_checkout_page_return',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-    'file' => 'uc_wirecard_checkout_page.pages.inc',
-  );
-  $items['cart/wirecard_checkout_page/iframe'] = array(
-    'title' => 'Wirecard Checkout Page',
-    'page callback' => 'uc_wirecard_checkout_page_iframe',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-    'file' => 'uc_wirecard_checkout_page.pages.inc',
-  );
+function uc_wirecard_checkout_page_menu()
+{
+    $items['cart/wirecard_checkout_page/confirm'] = array(
+        'title' => 'Server2server request payment status',
+        'page callback' => 'uc_wirecard_checkout_page_confirm',
+        'access callback' => true,
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
+    $items['cart/wirecard_checkout_page/return'] = array(
+        'title' => 'Browser return from payment page',
+        'page callback' => 'uc_wirecard_checkout_page_return',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
+    $items['cart/wirecard_checkout_page/iframe'] = array(
+        'title' => 'Wirecard Checkout Page',
+        'page callback' => 'uc_wirecard_checkout_page_iframe',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
+    $items['cart/wirecard_checkout_page/store'] = array(
+        'title' => 'Wirecard Checkout Page Store Data',
+        'page callback' => 'uc_wirecard_checkout_page_store_additional_data',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+        'file' => 'uc_wirecard_checkout_page.pages.inc',
+    );
 
-  return $items;
+    return $items;
 }
 
 
@@ -501,79 +647,96 @@ function uc_wirecard_checkout_page_menu() {
 /**
  * check whether invoice is allowed
  *
- * @param $order
+ * @param UcOrder $order
  *
  * @return bool
  */
-function uc_wirecard_checkout_page_invoice_allowed($order) {
-
-  $user = user_load($order->uid);
-
-  if (!property_exists($user, 'field_birthdate')) {
-    return FALSE;
-  }
-
-  $birthdate = $user->field_birthdate['und'][0]['value'];
-  $d1 = new DateTime($birthdate);
-  $diff = $d1->diff(new DateTime);
-  $customerAge = $diff->format('%y');
-  if ($customerAge < UC_WIRECARD_CHECKOUT_PAGE_INVOICE_INSTALLMENT_MIN_AGE) {
-    return FALSE;
-  }
-
-  if ($order->currency != 'EUR') {
-    return FALSE;
-  }
-
-  $fields = array('country', 'first_name', 'last_name', 'street1', 'street2', 'city', 'postal_code', 'zone');
-  foreach ($fields as $f) {
-    $bf = "billing_$f";
-    $df = "delivery_$f";
-    if ($order->$bf != $order->$df) {
-      return FALSE;
+function uc_wirecard_checkout_page_invoice_allowed($order)
+{
+    $min_amount = intval(variable_get('uc_wirecard_checkout_page_invoice_min_amount', 10));
+    $max_amount = intval(variable_get('uc_wirecard_checkout_page_invoice_max_amount', 3500));
+    if (strpos(variable_get('uc_wirecard_checkout_page_invoice_accepted_currencies', 'EUR'), $order->currency) === false
+    ) {
+        return t('Currency not allowed: ') . $order->currency;
     }
-  }
 
-  return TRUE;
+    if ($min_amount > $order->order_total) {
+        return t('Minimum order total not reached: ') . uc_currency_format($min_amount);
+    }
+
+    if ($max_amount < $order->order_total) {
+        return t('Maximum order total exceeded: ') . uc_currency_format($max_amount);
+    }
+
+    $fields = array(
+        'country',
+        'first_name',
+        'last_name',
+        'street1',
+        'street2',
+        'city',
+        'postal_code',
+        'zone'
+    );
+    if (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'payolution' && variable_get('uc_wirecard_checkout_page_addresses_equal') === true) {
+        foreach ($fields as $f) {
+            $bf = "billing_$f";
+            $df = "delivery_$f";
+            if ($order->$bf != $order->$df) {
+                return t('Billing and shipping addresses must be identical.');
+            }
+        }
+    }
+
+    return true;
 }
 
 /**
  * check whether installment is allowed
  *
- * @param $order
+ * @param UcOrder $order
  *
  * @return bool
  */
-function uc_wirecard_checkout_page_installment_allowed($order) {
-
-  $user = user_load($order->uid);
-
-  if (!property_exists($user, 'field_birthdate')) {
-    return FALSE;
-  }
-
-  $birthdate = $user->field_birthdate['und'][0]['value'];
-  $d1 = new DateTime($birthdate);
-  $diff = $d1->diff(new DateTime);
-  $customerAge = $diff->format('%y');
-  if ($customerAge < UC_WIRECARD_CHECKOUT_PAGE_INVOICE_INSTALLMENT_MIN_AGE) {
-    return FALSE;
-  }
-
-  if ($order->currency != 'EUR') {
-    return FALSE;
-  }
-
-  $fields = array('country', 'first_name', 'last_name', 'street1', 'street2', 'city', 'postal_code', 'zone');
-  foreach ($fields as $f) {
-    $bf = "billing_$f";
-    $df = "delivery_$f";
-    if ($order->$bf != $order->$df) {
-      return FALSE;
+function uc_wirecard_checkout_page_installment_allowed($order)
+{
+    $min_amount = intval(variable_get('uc_wirecard_checkout_page_installment_min_amount', 150));
+    $max_amount = intval(variable_get('uc_wirecard_checkout_page_installment_max_amount', 3500));
+    if (strpos(variable_get('uc_wirecard_checkout_page_installment_accepted_currencies'),
+            $order->currency) === false
+    ) {
+        return t('Currency not allowed: ') . $order->currency;
     }
-  }
 
-  return TRUE;
+    if ($order->order_total < $min_amount) {
+        return t('Minimum order total not reached: ') . uc_currency_format($min_amount);
+    }
+
+    if ($order->order_total > $max_amount) {
+        return t('Maximum order total exceeded: ') . uc_currency_format($max_amount);
+    }
+
+    $fields = array(
+        'country',
+        'first_name',
+        'last_name',
+        'street1',
+        'street2',
+        'city',
+        'postal_code',
+        'zone'
+    );
+    if (variable_get('uc_wirecard_checkout_page_installment_provider') == 'payolution' && variable_get('uc_wirecard_checkout_page_addresses_equal') === true) {
+        foreach ($fields as $f) {
+            $bf = "billing_$f";
+            $df = "delivery_$f";
+            if ($order->$bf != $order->$df) {
+                return t('Billing and shipping addresses must be identical.');
+            }
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -581,15 +744,17 @@ function uc_wirecard_checkout_page_installment_allowed($order) {
  *
  * @return mixed
  */
-function uc_wirecard_checkout_page_get_zone($zone) {
-  if (is_numeric($zone)) {
-    $result = db_query("SELECT * FROM {uc_zones} WHERE zone_id = :id", array(':id' => $zone));
-  }
-  else {
-    $result = db_query("SELECT * FROM {uc_zones} WHERE zone_name = :name", array(':name' => $zone));
-  }
+function uc_wirecard_checkout_page_get_zone($zone)
+{
+    if (is_numeric($zone)) {
+        $result = db_query("SELECT * FROM {uc_zones} WHERE zone_id = :id",
+            array(':id' => $zone));
+    } else {
+        $result = db_query("SELECT * FROM {uc_zones} WHERE zone_name = :name",
+            array(':name' => $zone));
+    }
 
-  return $result->fetchObject();
+    return $result->fetchObject();
 }
 
 /**
@@ -597,133 +762,207 @@ function uc_wirecard_checkout_page_get_zone($zone) {
  *
  * @return WirecardCEE_QPay_FrontendClient
  */
-function uc_wirecard_checkout_page_initiate_payment($order) {
-  global $language, $user;
+function uc_wirecard_checkout_page_initiate_payment($order)
+{
+    global $language, $user;
 
-  $paymenttype = strtoupper(str_replace('uc_wcp_', '', $order->payment_method));
-  $client = new WirecardCEE_QPay_FrontendClient(array(
-                                                     'CUSTOMER_ID' => variable_get(
-                                                       'uc_wirecard_checkout_page_customer_id'
-                                                     ),
-                                                     'SHOP_ID' => variable_get('uc_wirecard_checkout_page_shop_id'),
-                                                     'SECRET' => variable_get('uc_wirecard_checkout_page_secret'),
-                                                     'LANGUAGE' => $language->language
-                                                ));
+    $paymenttype = strtoupper(str_replace('uc_wcp_', '',
+        $order->payment_method));
+    $client = new WirecardCEE_QPay_FrontendClient(array(
+        'CUSTOMER_ID' => variable_get(
+            'uc_wirecard_checkout_page_customer_id'
+        ),
+        'SHOP_ID' => variable_get('uc_wirecard_checkout_page_shop_id'),
+        'SECRET' => variable_get('uc_wirecard_checkout_page_secret'),
+        'LANGUAGE' => $language->language
+    ));
 
-  $consumerData = new WirecardCEE_Stdlib_ConsumerData();
-  $consumerData->setUserAgent($_SERVER['HTTP_USER_AGENT'])
-    ->setIpAddress($_SERVER['REMOTE_ADDR']);
+    $returnUrl = url('cart/wirecard_checkout_page/return',
+        array('absolute' => true));
+    $confirmUrl = url('cart/wirecard_checkout_page/confirm',
+        array('absolute' => true, 'https' => true));
 
-  if (variable_get('uc_wirecard_checkout_page_send_additional_data') || in_array(
-      $paymenttype,
-      Array(WirecardCEE_QPay_PaymentType::INVOICE, WirecardCEE_QPay_PaymentType::INSTALLMENT)
-    )
-  ) {
-    uc_wirecard_checkout_page_set_consumer_information($order, $consumerData);
-  }
+    $sysinfo = system_get_info('module', 'uc_store');
 
-  $returnUrl = url('cart/wirecard_checkout_page/return', array('absolute' => TRUE));
-  $confirmUrl = url('cart/wirecard_checkout_page/confirm', array('absolute' => TRUE, 'https' => TRUE));
+    $version = WirecardCEE_QPay_FrontendClient::generatePluginVersion(
+        variable_get('uc_store_name'),
+        $sysinfo['version'],
+        UC_WIRECARD_CHECKOUT_PAGE_NAME,
+        UC_WIRECARD_CHECKOUT_PAGE_VERSION
+    );
 
-  $sysinfo = system_get_info('module', 'uc_store');
+    $client->setAmount(number_format($order->order_total, 2, '.', ''))
+        ->setCurrency($order->currency)
+        ->setPaymentType($paymenttype)
+        ->setOrderDescription(sprintf('user_id:%s order_id:%s', $user->uid,
+            $order->order_id))
+        ->setPluginVersion($version)
+        ->setSuccessUrl($returnUrl)
+        ->setPendingUrl($returnUrl)
+        ->setCancelUrl($returnUrl)
+        ->setFailureUrl($returnUrl)
+        ->setConfirmUrl($confirmUrl)
+        ->setServiceUrl(variable_get('uc_wirecard_checkout_page_service_url'))
+        ->setImageUrl(variable_get('uc_wirecard_checkout_page_image_url'))
+        ->setDisplayText(variable_get('uc_wirecard_checkout_page_display_text'))
+        ->setCustomerStatement(sprintf('%s #%06s',
+            variable_get('uc_store_name'), $order->order_id))
+        ->setDuplicateRequestCheck(false)
+        ->setMaxRetries(variable_get('uc_wirecard_checkout_page_max_retries'))
+        ->setAutoDeposit(variable_get('uc_wirecard_checkout_page_auto_deposit'))
+        ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME)
+        ->createConsumerMerchantCrmId($user->mail)
+        ->setShippingProfile('NO_SHIPPING');
 
-  $version = WirecardCEE_QPay_FrontendClient::generatePluginVersion(
-    variable_get('uc_store_name'),
-    $sysinfo['version'],
-    UC_WIRECARD_CHECKOUT_PAGE_NAME,
-    UC_WIRECARD_CHECKOUT_PAGE_VERSION
-  );
+    uc_wirecard_checkout_page_setConsumerData($client, $paymenttype, $order);
+    uc_wirecard_checkout_page_setBasketInformation($client, $paymenttype, $order);
 
-  $client->setAmount(number_format($order->order_total, 2, '.', ''))
-    ->setCurrency($order->currency)
-    ->setPaymentType($paymenttype)
-    ->setOrderDescription(sprintf('user_id:%s order_id:%s', $user->uid, $order->order_id))
-    ->setPluginVersion($version)
-    ->setSuccessUrl($returnUrl)
-    ->setPendingUrl($returnUrl)
-    ->setCancelUrl($returnUrl)
-    ->setFailureUrl($returnUrl)
-    ->setConfirmUrl($confirmUrl)
-    ->setServiceUrl(variable_get('uc_wirecard_checkout_page_service_url'))
-    ->setImageUrl(variable_get('uc_wirecard_checkout_page_image_url'))
-    ->setConsumerData($consumerData)
-    ->setDisplayText(variable_get('uc_wirecard_checkout_page_display_text'))
-    ->setCustomerStatement(sprintf('%s #%06s', variable_get('uc_store_name'), $order->order_id))
-    ->setDuplicateRequestCheck(FALSE)
-    ->setMaxRetries(variable_get('uc_wirecard_checkout_page_max_retries'))
-    ->setAutoDeposit(variable_get('uc_wirecard_checkout_page_auto_deposit'))
-    ->setWindowName(UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME)->createConsumerMerchantCrmId($user->mail);
-
-  $client->ubercartOrderId = $order->order_id;
-  $client->ubercartCartId = uc_cart_get_id();
-
-  return $client;
+    if (isset($_SESSION['wcp_additional'])) {
+        foreach ($_SESSION['wcp_additional'] as $method => $value) {
+            $client->{"set$method"}($value);
+        }
+        unset($_SESSION['wcp_additional']);
+    }
+    $client->ubercartOrderId = $order->order_id;
+    $client->ubercartCartId = uc_cart_get_id();
+    return $client;
 }
 
+/**
+ * @param WirecardCEE_QPay_FrontendClient $client
+ * @param $paymenttype
+ * @param UcOrder $order
+ */
+function uc_wirecard_checkout_page_setConsumerData(&$client, $paymenttype, $order)
+{
+    global $user;
+
+    $force_shipping_data = variable_get('uc_wirecard_checkout_page_send_shipping_data', true)
+        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
+        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
+
+    $force_additional_data = variable_get('uc_wirecard_checkout_page_send_additional_data', true)
+        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
+        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
+
+    $consumer_data = new WirecardCEE_Stdlib_ConsumerData();
+    $consumer_data->setUserAgent($_SERVER['HTTP_USER_AGENT'])
+        ->setIpAddress(uc_wirecard_checkout_page_get_client_ip());
+
+    $billingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_BILLING);
+
+    $billing_country = uc_get_country_data(array('country_id' => $order->billing_country));
+    $billing_country = array_pop($billing_country);
+    $billing_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
+    // for US/CA statecode (2 chars)
+    if ($billing_country['country_iso_code_2'] == 'US' || $billing_country['country_iso_code_2'] == 'CA') {
+        $billingAddress->setState($billing_zone->zone_code);
+    } else {
+        $billingAddress->setState($billing_zone->zone_name);
+    }
+
+    $billingAddress->setFirstname($order->billing_first_name)
+        ->setLastname($order->billing_last_name)
+        ->setAddress1($order->billing_street1)
+        ->setAddress2($order->billing_street2)
+        ->setCity($order->billing_city)
+        ->setZipCode($order->billing_postal_code)
+        ->setCountry($billing_country['country_iso_code_2'])
+        ->setPhone($order->billing_phone);
+
+    $consumer_data->addAddressInformation($billingAddress);
+
+    if ($force_additional_data) {
+        $consumer_data->setEmail($user->mail);
+        if (property_exists($user, 'field_birthdate')) {
+            $birthdate = $user->field_birthdate['und'][0]['value'];
+            $consumer_data->setBirthDate(new DateTime($birthdate));
+        }
+    }
+
+    if ($force_shipping_data) {
+        $shippingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_SHIPPING);
+        $shipping_country = uc_get_country_data(array('country_id' => $order->delivery_country));
+        $shipping_country = array_pop($shipping_country);
+        $shipping_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
+
+        $shippingAddress->setFirstname($order->delivery_first_name)
+            ->setLastname($order->delivery_last_name)
+            ->setAddress1($order->delivery_street1)
+            ->setAddress2($order->delivery_street2)
+            ->setCity($order->delivery_city)
+            ->setZipCode($order->delivery_postal_code)
+            ->setCountry($shipping_country['country_iso_code_2']);
+        if ($shipping_country['country_iso_code_2'] == 'US' || $shipping_country['country_iso_code_2'] == 'CA') {
+            $shippingAddress->setState($shipping_zone->zone_code);
+        } else {
+            $shippingAddress->setState($shipping_zone->zone_name);
+        }
+        $consumer_data->addAddressInformation($shippingAddress);
+    }
+    $client->setConsumerData($consumer_data);
+}
 
 /**
- * Set additional consumer information
- *
- * @param $order
- * @param WirecardCEE_Stdlib_ConsumerData $consumerData
+ * @param WirecardCEE_QPay_FrontendClient $client
+ * @param $paymenttype
+ * @param UcOrder $order
  */
-function uc_wirecard_checkout_page_set_consumer_information($order, WirecardCEE_Stdlib_ConsumerData $consumerData) {
+function uc_wirecard_checkout_page_setBasketInformation(&$client, $paymenttype, $order)
+{
+    $basket = new WirecardCEE_Stdlib_Basket();
+    $force_basket = variable_get('uc_wirecard_checkout_page_send_basket_data', true)
+        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
+        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
 
-  $user = user_load($order->uid);
+    if ($force_basket) {
+        $tax = 0;
 
-  if (property_exists($user, 'field_birthdate')) {
-    $birthdate = $user->field_birthdate['und'][0]['value'];
-    $consumerData->setBirthDate(new DateTime($birthdate));
-  }
+        if (property_exists($order, 'line_items')) {
+            foreach ($order->line_items as $line_item) {
+                if ($line_item['type'] == 'tax') {
+                    $tax = $line_item['data']['tax'];
+                }
+            }
+            foreach ($order->line_items as $line_item) {
+                if ($line_item['type'] == 'shipping') {
+                    $shipping_basket_item = new WirecardCEE_Stdlib_Basket_Item('shipping');
+                    $taxable = in_array($line_item['type'], $tax->taxed_line_items);
+                    $shipping_basket_item->setName('Shipping')
+                        ->setUnitNetAmount(number_format($line_item['amount'], 2))
+                        ->setUnitGrossAmount(number_format($taxable ? $line_item['amount'] * ($tax->rate + 1) : $line_item['amount'], 2))
+                        ->setUnitTaxAmount(number_format($taxable ? $line_item['amount'] * (1 + $tax->rate) - $line_item['amount'] : 0, 2))
+                        ->setUnitTaxRate(number_format($taxable ? $tax->rate * 100 : 0, 2));
 
-  $consumerData->setEmail($order->primary_email);
+                    $basket->addItem($shipping_basket_item);
+                }
+            }
+        }
+        foreach ($order->products as $product) {
+            $basket_item = new WirecardCEE_Stdlib_Basket_Item($product->nid);
 
-  $billingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_BILLING);
+            $basket_item->setName($product->title)
+                ->setUnitNetAmount(number_format($product->price, 2))
+                ->setUnitGrossAmount(number_format($product->price * ($tax->rate + 1),2))
+                ->setUnitTaxAmount(number_format($product->price * (1 + $tax->rate) - $product->price,2))
+                ->setUnitTaxRate(number_format($tax->rate * 100, 2));
 
-  $billing_country = uc_get_country_data(array('country_id' => $order->billing_country));
-  $billing_country = array_pop($billing_country);
-  $billing_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
+            $basket->addItem($basket_item, $product->qty);
+        }
 
-  $billingAddress->setFirstname($order->billing_first_name)
-    ->setLastname($order->billing_last_name)
-    ->setAddress1($order->billing_street1)
-    ->setAddress2($order->billing_street2)
-    ->setCity($order->billing_city)
-    ->setZipCode($order->billing_postal_code)
-    ->setCountry($billing_country['country_iso_code_2'])
-    ->setPhone($order->billing_phone);
+        $client->setBasket($basket);
+    }
+}
 
-  // for US/CA statecode (2 chars)
-  if ($billing_country['country_iso_code_2'] == 'US' || $billing_country['country_iso_code_2'] == 'CA') {
-    $billingAddress->setState($billing_zone->zone_code);
-  }
-  else {
-    $billingAddress->setState($billing_zone->zone_name);
-  }
-
-  $shippingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_SHIPPING);
-
-  $shipping_country = uc_get_country_data(array('country_id' => $order->delivery_country));
-  $shipping_country = array_pop($shipping_country);
-  $shipping_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
-
-  $shippingAddress->setFirstname($order->delivery_first_name)
-    ->setLastname($order->delivery_last_name)
-    ->setAddress1($order->delivery_street1)
-    ->setAddress2($order->delivery_street2)
-    ->setCity($order->delivery_city)
-    ->setZipCode($order->delivery_postal_code)
-    ->setCountry($shipping_country['country_iso_code_2']);
-
-  // for US/CA statecode (2 chars)
-  if ($shipping_country['country_iso_code_2'] == 'US' || $shipping_country['country_iso_code_2'] == 'CA') {
-    $shippingAddress->setState($shipping_zone->zone_code);
-  }
-  else {
-    $shippingAddress->setState($shipping_zone->zone_name);
-  }
-
-  $consumerData->addAddressInformation($billingAddress)
-    ->addAddressInformation($shippingAddress);
-
+function uc_wirecard_checkout_page_get_client_ip()
+{
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR']) {
+        if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',')) {
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return $ips[0];
+        } else {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+    }
+    return $_SERVER['REMOTE_ADDR'];
 }
