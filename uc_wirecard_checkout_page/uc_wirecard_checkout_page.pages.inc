@@ -266,7 +266,9 @@ function uc_wirecard_checkout_page_return() {
 
   // order completion is allowed
   if ($redirect == 'cart/checkout/complete') {
-    $_SESSION['uc_checkout'][$_SESSION['cart_order']]['do_complete'] = TRUE;
+      if (isset($_SESSION['cart_order'])) {
+          $_SESSION['uc_checkout'][$_SESSION['cart_order']]['do_complete'] = true;
+      }
   }
 
   drupal_goto($redirect);

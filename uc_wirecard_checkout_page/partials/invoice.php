@@ -37,8 +37,15 @@ $a = '<div class="wcp_pm_additional">';
 $a .= '<div id="wcp_invoice_birthday">' . t('Birthday') . ':</div>';
 $a .= '<div id="wcp_invoice_too_young">' . t('You have to be 18 years or older to use this payment.') . '</div>';
 
+$consent_message = t('I agree that the data which are necessary for the liquidation of installments and which are used to complete the identity and credit check are transmitted to payolution. My __consent__ can be revoked at any time with future effect.');
+
+$consent_message = preg_replace_callback('/__(.*?)__/i', function ($a) {
+    $mid = variable_get('uc_wirecard_checkout_page_payolution_mid');
+    return (strlen($mid) > 2) ? "<a style='color:white;mix-blend-mode:difference;' href='https://payment.payolution.com/payolution-payment/infoport/dataprivacyconsent?mId=" . base64_encode($mid) . "' target='_blank'>$a[1]</a>" : $a[1];
+}, $consent_message);
+
 if (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'payolution' && variable_get('uc_wirecard_checkout_page_payolution_terms') == true) {
-    $a .= '<div id="wcp_invoice_payolution_terms">' . t('I agree that the data which are necessary for the liquidation of installments and which are used to complete the identity and credit check are transmitted to payolution.  My __consent__ can be revoked at any time with future effect.') . '</div>';
+    $a .= '<div id="wcp_invoice_payolution_terms">' . $consent_message . '</div>';
     $a .= '<div id="wcp_invoice_payolution_terms_not_checked">' . t('Consumer must accept payolution terms during the checkout process.') . '</div>';
 }
 
