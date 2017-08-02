@@ -42,13 +42,15 @@ $(document).ready(function() {
     });
 
     $("#edit-continue").click(function(){
-        $.ajax({
-            url:'wirecard_checkout_page/store',
-            type:'POST',
-            async:false,
-            data:{
-                financialInstitution:$('select[name=idealFinancialInstitution] option:selected').val()
-            }
-        });
+        if ($("#edit-panes-payment-payment-method-uc-wcp-idl").is(":checked")) {
+            $.ajax({
+                url: 'wirecard_checkout_page/store',
+                type: 'POST',
+                async: false,
+                data: {
+                    financialInstitution: $('select[name=idealFinancialInstitution] option:selected').val()
+                }
+            });
+        }
     });
 });

@@ -34,21 +34,23 @@
  */
 
 $ = jQuery;
-$(document).ready(function() {
+$(document).ready(function () {
     var institutions = $.parseJSON($("#wcp_eps_institutions").html());
     $("#wcp_eps_financialInstitution").wrap('<label>').append("<select name='epsFinancialInstitution'></select>");
-    $.each(institutions,function(a,b){
-        $("#wcp_eps_financialInstitution").find('select').append('<option value="'+a+'">'+b+'</option>');
+    $.each(institutions, function (a, b) {
+        $("#wcp_eps_financialInstitution").find('select').append('<option value="' + a + '">' + b + '</option>');
     });
 
-    $("#edit-continue").click(function(){
-        $.ajax({
-            url:'wirecard_checkout_page/store',
-            type:'POST',
-            async:false,
-            data:{
-                financialInstitution:$('select[name=epsFinancialInstitution] option:selected').val()
-            }
-        });
+    $("#edit-continue").click(function () {
+        if ($("#edit-panes-payment-payment-method-uc-wcp-eps").is(":checked")) {
+            $.ajax({
+                url: 'wirecard_checkout_page/store',
+                type: 'POST',
+                async: false,
+                data: {
+                    financialInstitution: $('select[name=epsFinancialInstitution] option:selected').val()
+                }
+            });
+        }
     });
 });
