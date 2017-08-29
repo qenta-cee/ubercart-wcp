@@ -823,6 +823,10 @@ function uc_wirecard_checkout_page_initiate_payment($order)
         }
         unset($_SESSION['wcp_additional']);
     }
+
+    if (isset($_SESSION['wcp-consumerDeviceId'])) {
+        $client = $_SESSION['wcp-consumerDeviceId'];
+    }
     $client->ubercartOrderId = $order->order_id;
     $client->ubercartCartId = uc_cart_get_id();
     return $client;
@@ -964,5 +968,23 @@ function uc_wirecard_checkout_page_get_client_ip()
             return $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
     }
+    print_r($_SERVER);
     return $_SERVER['REMOTE_ADDR'];
+}
+
+function uc_wirecard_checkout_page_page_build(&$page)
+{
+    if (!isset($page['content']['system_main']) || !isset($page['content']['system_main']['#attributes'])
+        || !isset($page['content']['system_main']['#attributes']['class'])
+    ) {
+        return;
+    }
+    if (in_array('uc-cart-checkout-form',$page['content']['system_main']['#attributes']['class'])) {
+        include "partials/consumerDeviceId.php";
+
+        $page['page_bottom']['devel'] = array(
+            '#weight' => 100,
+            '#markup' => $script
+        );
+    }
 }
