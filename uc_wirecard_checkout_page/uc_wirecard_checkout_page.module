@@ -853,6 +853,7 @@ function uc_wirecard_checkout_page_setConsumerData(&$client, $paymenttype, $orde
 
     $consumer_data = new WirecardCEE_Stdlib_ConsumerData();
     $consumer_data->setUserAgent($_SERVER['HTTP_USER_AGENT'])
+        ->setEmail($user->mail)
         ->setIpAddress(uc_wirecard_checkout_page_get_client_ip());
 
     $billingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_BILLING);
@@ -970,7 +971,6 @@ function uc_wirecard_checkout_page_get_client_ip()
             return $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
     }
-    print_r($_SERVER);
     return $_SERVER['REMOTE_ADDR'];
 }
 
