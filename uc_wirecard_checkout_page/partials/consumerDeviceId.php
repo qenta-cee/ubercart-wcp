@@ -1,3 +1,4 @@
+<?php
 /**
  * Shop System Plugins - Terms of Use
  *
@@ -16,7 +17,7 @@
  * for any errors occurring when used in an enhanced, customized shop system
  * configuration.
  *
- * Operation in an enhanced, customized configuration is at your own risk and
+ * Operation in an enhanced, customized configuration is at your own rissk and
  * requires a comprehensive test phase by the user of the plugin.
  *
  * Customers use the plugins at their own risk. Wirecard CEE does not guarantee
@@ -32,27 +33,17 @@
  * terms of use. Please do not use the plugin if you do not agree to these
  * terms of use!
  */
+if (!isset($_SESSION['wcp-consumerDeviceId'])) {
+    $timestamp = microtime();
+    $_SESSION['wcp-consumerDeviceId'] = md5(variable_get('uc_wirecard_checkout_page_customer_id') . "_" . $timestamp);
+}
 
-$ = jQuery;
-$(document).ready(function () {
-    if($("#wcp_eps_financialInstitution").length == 0)
-        return;
-    var institutions = $.parseJSON($("#wcp_eps_institutions").html());
-    $("#wcp_eps_financialInstitution").wrap('<label>').append("<select name='epsFinancialInstitution'></select>");
-    $.each(institutions, function (a, b) {
-        $("#wcp_eps_financialInstitution").find('select').append('<option value="' + a + '">' + b + '</option>');
-    });
-
-    $("#edit-continue").click(function () {
-        if ($("#edit-panes-payment-payment-method-uc-wcp-eps").is(":checked")) {
-            $.ajax({
-                url: 'wirecard_checkout_page/store',
-                type: 'POST',
-                async: false,
-                data: {
-                    financialInstitution: $('select[name=epsFinancialInstitution] option:selected').val()
-                }
-            });
-        }
-    });
-});
+$script = '<script language="JavaScript">var di = {t: "' . $_SESSION['wcp-consumerDeviceId'] . '", v: "WDWL", l: "Checkout"};</script>';
+$script .= '<script type="text/javascript" src="//d.ratepay.com/' . $_SESSION['wcp-consumerDeviceId'] . '/di.js"></script>';
+$script .= '<noscript><link rel="stylesheet" type="text/css" href="//d.ratepay.com/di.css?t=' . $_SESSION['wcp-consumerDeviceId'] . '&v=WDWL&l=Checkout"></noscript>';
+$script .= '<object type="application/x-shockwave-flash" data="//d.ratepay.com/WDWL/c.swf" width="0" height="0">
+    <param name="movie" value="//d.ratepay.com/WDWL/c.swf"/>
+    <param name="flashvars" value="t=' . $_SESSION['wcp-consumerDeviceId'] . '&v=WDWL"/>
+    <param name="AllowScriptAccess" value="always"/>
+</object>';
+?>

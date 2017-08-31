@@ -35,6 +35,8 @@
 
 $ = jQuery;
 $(document).ready(function() {
+    if($("#wcp_installment_birthday").length == 0)
+        return;
     $("#wcp_installment_birthday").wrap('<label>').append("<input type='text' id='wcp_installment_datepicker' name='wcp_installment_birthday'>");
     $("#wcp_installment_datepicker").datepicker({
         changeYear : true,

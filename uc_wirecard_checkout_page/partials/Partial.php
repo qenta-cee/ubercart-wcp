@@ -45,7 +45,7 @@ class Partial
     static function invoice(){
         drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/invoice.css');
         drupal_add_library('system', 'ui.datepicker');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/invoice.js');
+        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/invoice.js', array('scope' => 'footer'));
         return include "invoice.php";
     }
 
@@ -57,7 +57,7 @@ class Partial
     static function installment(){
         drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/installment.css');
         drupal_add_library('system', 'ui.datepicker');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/installment.js');
+        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/installment.js', array('scope' => 'footer'));
         return include "installment.php";
     }
 
@@ -68,7 +68,7 @@ class Partial
      */
     static function ideal(){
         drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/ideal.css');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/ideal.js');
+        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/ideal.js', array('scope' => 'footer'));
         return include "ideal.php";
     }
 
@@ -79,7 +79,7 @@ class Partial
      */
     static function eps(){
         drupal_add_css(drupal_get_path('module','uc_wirecard_checkout_page').'/media/css/eps.css');
-        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/eps.js');
+        drupal_add_js(drupal_get_path('module','uc_wirecard_checkout_page').'/media/js/eps.js', array('scope' => 'footer'));
         return include "eps.php";
     }
 }

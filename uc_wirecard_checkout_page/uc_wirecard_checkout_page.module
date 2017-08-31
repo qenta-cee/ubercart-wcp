@@ -41,7 +41,7 @@
  */
 
 define('UC_WIRECARD_CHECKOUT_PAGE_NAME', 'Uebercart35_WirecardCheckoutPage');
-define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.0');
+define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.1');
 define('UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME', 'WirecardCheckoutPageFrame');
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname(__FILE__) . '/library');
@@ -817,12 +817,18 @@ function uc_wirecard_checkout_page_initiate_payment($order)
     uc_wirecard_checkout_page_setConsumerData($client, $paymenttype, $order);
     uc_wirecard_checkout_page_setBasketInformation($client, $paymenttype, $order);
 
+
     if (isset($_SESSION['wcp_additional'])) {
         foreach ($_SESSION['wcp_additional'] as $method => $value) {
             $client->{"set$method"}($value);
         }
         unset($_SESSION['wcp_additional']);
     }
+
+    if (isset($_SESSION['wcp-consumerDeviceId'])) {
+        $client->consumerDeviceId = $_SESSION['wcp-consumerDeviceId'];
+    }
+    
     $client->ubercartOrderId = $order->order_id;
     $client->ubercartCartId = uc_cart_get_id();
     return $client;
@@ -842,42 +848,45 @@ function uc_wirecard_checkout_page_setConsumerData(&$client, $paymenttype, $orde
         || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
 
     $force_additional_data = variable_get('uc_wirecard_checkout_page_send_additional_data', true)
-        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
-        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
+        || ($paymenttype == 'INSTALLMENT')
+        || ($paymenttype == 'INVOICE');
+
+    $force_billing_data = variable_get('uc_wirecard_checkout_page_send_billing_data', true)
+        || ($paymenttype == 'PAYPAL' || $paymenttype == 'SKRILLWALLET' || $paymenttype == 'TRUSTLY' || $paymenttype == 'INVOICE' || $paymenttype == 'INSTALLMENT');
 
     $consumer_data = new WirecardCEE_Stdlib_ConsumerData();
     $consumer_data->setUserAgent($_SERVER['HTTP_USER_AGENT'])
+        ->setEmail($user->mail)
         ->setIpAddress(uc_wirecard_checkout_page_get_client_ip());
 
-    $billingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_BILLING);
-
-    $billing_country = uc_get_country_data(array('country_id' => $order->billing_country));
-    $billing_country = array_pop($billing_country);
-    $billing_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
-    // for US/CA statecode (2 chars)
-    if ($billing_country['country_iso_code_2'] == 'US' || $billing_country['country_iso_code_2'] == 'CA') {
-        $billingAddress->setState($billing_zone->zone_code);
-    } else {
-        $billingAddress->setState($billing_zone->zone_name);
+    if ($force_additional_data) {
+        if (property_exists($user, 'field_birthdate')) {
+            $consumer_data->setBirthDate(new DateTime($user->field_birthdate['und'][0]['value']));
+        }
     }
 
-    $billingAddress->setFirstname($order->billing_first_name)
-        ->setLastname($order->billing_last_name)
-        ->setAddress1($order->billing_street1)
-        ->setAddress2($order->billing_street2)
-        ->setCity($order->billing_city)
-        ->setZipCode($order->billing_postal_code)
-        ->setCountry($billing_country['country_iso_code_2'])
-        ->setPhone($order->billing_phone);
+    if ($force_billing_data) {
+        $billingAddress = new WirecardCEE_Stdlib_ConsumerData_Address(WirecardCEE_Stdlib_ConsumerData_Address::TYPE_BILLING);
 
-    $consumer_data->addAddressInformation($billingAddress);
-
-    if ($force_additional_data) {
-        $consumer_data->setEmail($user->mail);
-        if (property_exists($user, 'field_birthdate')) {
-            $birthdate = $user->field_birthdate['und'][0]['value'];
-            $consumer_data->setBirthDate(new DateTime($birthdate));
+        $billing_country = uc_get_country_data(array('country_id' => $order->billing_country));
+        $billing_country = array_pop($billing_country);
+        $billing_zone = uc_wirecard_checkout_page_get_zone($order->billing_zone);
+        // for US/CA statecode (2 chars)
+        if ($billing_country['country_iso_code_2'] == 'US' || $billing_country['country_iso_code_2'] == 'CA') {
+            $billingAddress->setState($billing_zone->zone_code);
+        } else {
+            $billingAddress->setState($billing_zone->zone_name);
         }
+
+        $billingAddress->setFirstname($order->billing_first_name)
+            ->setLastname($order->billing_last_name)
+            ->setAddress1($order->billing_street1)
+            ->setAddress2($order->billing_street2)
+            ->setCity($order->billing_city)
+            ->setZipCode($order->billing_postal_code)
+            ->setCountry($billing_country['country_iso_code_2'])
+            ->setPhone($order->billing_phone);
+        $consumer_data->addAddressInformation($billingAddress);
     }
 
     if ($force_shipping_data) {
@@ -965,4 +974,21 @@ function uc_wirecard_checkout_page_get_client_ip()
         }
     }
     return $_SERVER['REMOTE_ADDR'];
+}
+
+function uc_wirecard_checkout_page_page_build(&$page)
+{
+    if (!isset($page['content']['system_main']) || !isset($page['content']['system_main']['#attributes'])
+        || !isset($page['content']['system_main']['#attributes']['class'])
+    ) {
+        return;
+    }
+    if (in_array('uc-cart-checkout-form',$page['content']['system_main']['#attributes']['class'])) {
+        include "partials/consumerDeviceId.php";
+
+        $page['page_bottom']['devel'] = array(
+            '#weight' => 100,
+            '#markup' => $script
+        );
+    }
 }

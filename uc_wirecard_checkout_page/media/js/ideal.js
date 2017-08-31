@@ -35,6 +35,8 @@
 
 $ = jQuery;
 $(document).ready(function() {
+    if($("#wcp_ideal_financialInstitution").length == 0)
+        return;
     var institutions = $.parseJSON($("#wcp_ideal_institutions").html());
     $("#wcp_ideal_financialInstitution").wrap('<label>').append("<select name='idealFinancialInstitution'></select>");
     $.each(institutions,function(a,b){

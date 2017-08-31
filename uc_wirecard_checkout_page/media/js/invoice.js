@@ -35,6 +35,8 @@
 
 $ = jQuery;
 $(document).ready(function() {
+    if($("#wcp_invoice_birthday").length == 0)
+        return;
     $("#wcp_invoice_birthday").wrap('<label>').append("<input type='text' id='wcp_invoice_datepicker' name='wcp_invoice_birthday'>");
     $("#wcp_invoice_datepicker").datepicker({
         changeYear : true,
