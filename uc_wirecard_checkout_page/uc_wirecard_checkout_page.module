@@ -817,6 +817,7 @@ function uc_wirecard_checkout_page_initiate_payment($order)
     uc_wirecard_checkout_page_setConsumerData($client, $paymenttype, $order);
     uc_wirecard_checkout_page_setBasketInformation($client, $paymenttype, $order);
 
+
     if (isset($_SESSION['wcp_additional'])) {
         foreach ($_SESSION['wcp_additional'] as $method => $value) {
             $client->{"set$method"}($value);
@@ -825,8 +826,9 @@ function uc_wirecard_checkout_page_initiate_payment($order)
     }
 
     if (isset($_SESSION['wcp-consumerDeviceId'])) {
-        $client = $_SESSION['wcp-consumerDeviceId'];
+        $client->consumerDeviceId = $_SESSION['wcp-consumerDeviceId'];
     }
+    
     $client->ubercartOrderId = $order->order_id;
     $client->ubercartCartId = uc_cart_get_id();
     return $client;
