@@ -35,6 +35,8 @@
 
 $ = jQuery;
 $(document).ready(function () {
+    if($("#wcp_eps_financialInstitution").length == 0)
+        return;
     var institutions = $.parseJSON($("#wcp_eps_institutions").html());
     $("#wcp_eps_financialInstitution").wrap('<label>').append("<select name='epsFinancialInstitution'></select>");
     $.each(institutions, function (a, b) {
