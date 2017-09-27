@@ -193,9 +193,9 @@ function uc_wirecard_checkout_page_uc_payment_method()
     );
     $methods[] = array(
         'id' => 'uc_wcp_sofortueberweisung',
-        'name' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-        'title' => t('SOFORT') . $image('sofortueberweisung'),
-        'desc' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
+        'name' => t('Wirecard Checkout Page Online bank transfer.'),
+        'title' => t('Online bank transfer.') . $image('sofortueberweisung'),
+        'desc' => t('Wirecard Checkout Page Online bank transfer.'),
         'callback' => 'uc_wirecard_checkout_page',
         'redirect' => 'uc_wirecard_checkout_page_form',
         'weight' => 170,
