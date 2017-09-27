@@ -41,7 +41,7 @@
  */
 
 define('UC_WIRECARD_CHECKOUT_PAGE_NAME', 'Uebercart35_WirecardCheckoutPage');
-define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.1');
+define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.2');
 define('UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME', 'WirecardCheckoutPageFrame');
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname(__FILE__) . '/library');
