@@ -41,7 +41,7 @@
  */
 
 define('UC_WIRECARD_CHECKOUT_PAGE_NAME', 'Uebercart35_WirecardCheckoutPage');
-define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.1');
+define('UC_WIRECARD_CHECKOUT_PAGE_VERSION', '1.2.2');
 define('UC_WIRECARD_CHECKOUT_PAGE_WINDOWNAME', 'WirecardCheckoutPageFrame');
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname(__FILE__) . '/library');
@@ -193,9 +193,9 @@ function uc_wirecard_checkout_page_uc_payment_method()
     );
     $methods[] = array(
         'id' => 'uc_wcp_sofortueberweisung',
-        'name' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
-        'title' => t('SOFORT') . $image('sofortueberweisung'),
-        'desc' => t('Wirecard Checkout Page SOFORT banking (PIN/TAN)'),
+        'name' => t('Wirecard Checkout Page Online bank transfer.'),
+        'title' => t('Online bank transfer.') . $image('sofortueberweisung'),
+        'desc' => t('Wirecard Checkout Page Online bank transfer.'),
         'callback' => 'uc_wirecard_checkout_page',
         'redirect' => 'uc_wirecard_checkout_page_form',
         'weight' => 170,

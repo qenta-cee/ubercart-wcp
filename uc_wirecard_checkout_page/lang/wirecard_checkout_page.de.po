@@ -147,8 +147,8 @@ msgid "giropay"
 msgstr "giropay"
 
 #: uc_wirecard_checkout_page.module:140;141;142
-msgid "SOFORT"
-msgstr "SOFORT Überweisung"
+msgid "Online bank transfer."
+msgstr "Sofort."
 
 #: uc_wirecard_checkout_page.module:150;151;152
 msgid "paybox"
