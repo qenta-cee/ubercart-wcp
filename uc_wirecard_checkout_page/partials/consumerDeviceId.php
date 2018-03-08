@@ -33,6 +33,7 @@
  * terms of use. Please do not use the plugin if you do not agree to these
  * terms of use!
  */
+$script = "";
 if (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay' || variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay') {
     if (!isset($_SESSION['wcp-consumerDeviceId'])) {
         $timestamp = microtime();
