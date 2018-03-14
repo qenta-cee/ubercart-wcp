@@ -33,17 +33,20 @@
  * terms of use. Please do not use the plugin if you do not agree to these
  * terms of use!
  */
-if (!isset($_SESSION['wcp-consumerDeviceId'])) {
-    $timestamp = microtime();
-    $_SESSION['wcp-consumerDeviceId'] = md5(variable_get('uc_wirecard_checkout_page_customer_id') . "_" . $timestamp);
-}
+$script = "";
+if (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay' || variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay') {
+    if (!isset($_SESSION['wcp-consumerDeviceId'])) {
+        $timestamp = microtime();
+        $_SESSION['wcp-consumerDeviceId'] = md5(variable_get('uc_wirecard_checkout_page_customer_id') . "_" . $timestamp);
+    }
 
-$script = '<script language="JavaScript">var di = {t: "' . $_SESSION['wcp-consumerDeviceId'] . '", v: "WDWL", l: "Checkout"};</script>';
-$script .= '<script type="text/javascript" src="//d.ratepay.com/' . $_SESSION['wcp-consumerDeviceId'] . '/di.js"></script>';
-$script .= '<noscript><link rel="stylesheet" type="text/css" href="//d.ratepay.com/di.css?t=' . $_SESSION['wcp-consumerDeviceId'] . '&v=WDWL&l=Checkout"></noscript>';
-$script .= '<object type="application/x-shockwave-flash" data="//d.ratepay.com/WDWL/c.swf" width="0" height="0">
-    <param name="movie" value="//d.ratepay.com/WDWL/c.swf"/>
-    <param name="flashvars" value="t=' . $_SESSION['wcp-consumerDeviceId'] . '&v=WDWL"/>
-    <param name="AllowScriptAccess" value="always"/>
-</object>';
+    $script  = '<script language="JavaScript">var di = {t: "' . $_SESSION['wcp-consumerDeviceId'] . '", v: "WDWL", l: "Checkout"};</script>';
+    $script .= '<script type="text/javascript" src="//d.ratepay.com/' . $_SESSION['wcp-consumerDeviceId'] . '/di.js"></script>';
+    $script .= '<noscript><link rel="stylesheet" type="text/css" href="//d.ratepay.com/di.css?t=' . $_SESSION['wcp-consumerDeviceId'] . '&v=WDWL&l=Checkout"></noscript>';
+    $script .= '<object type="application/x-shockwave-flash" data="//d.ratepay.com/WDWL/c.swf" width="0" height="0">
+                    <param name="movie" value="//d.ratepay.com/WDWL/c.swf"/>
+                    <param name="flashvars" value="t=' . $_SESSION['wcp-consumerDeviceId'] . '&v=WDWL"/>
+                    <param name="AllowScriptAccess" value="always"/>
+                </object>';
+}
 ?>
