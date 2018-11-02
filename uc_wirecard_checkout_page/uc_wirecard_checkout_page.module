@@ -921,8 +921,8 @@ function uc_wirecard_checkout_page_setBasketInformation(&$client, $paymenttype, 
 {
     $basket = new WirecardCEE_Stdlib_Basket();
     $force_basket = variable_get('uc_wirecard_checkout_page_send_basket_data', true)
-        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
-        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
+        || ($paymenttype == 'INVOICE' && (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay'))
+        || ($paymenttype == 'INSTALLMENT' && (variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay'));
 
     if ($force_basket) {
         $tax = 0;
