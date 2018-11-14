@@ -921,8 +921,8 @@ function uc_wirecard_checkout_page_setBasketInformation(&$client, $paymenttype, 
 {
     $basket = new WirecardCEE_Stdlib_Basket();
     $force_basket = variable_get('uc_wirecard_checkout_page_send_basket_data', true)
-        || ($paymenttype == 'INSTALLMENT' && variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay')
-        || ($paymenttype == 'INVOICE' && variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay');
+        || ($paymenttype == 'INVOICE' && (variable_get('uc_wirecard_checkout_page_invoice_provider') == 'ratepay'))
+        || ($paymenttype == 'INSTALLMENT' && (variable_get('uc_wirecard_checkout_page_installment_provider') == 'ratepay'));
 
     if ($force_basket) {
         $tax = 0;
@@ -933,17 +933,23 @@ function uc_wirecard_checkout_page_setBasketInformation(&$client, $paymenttype, 
                     $tax = $line_item['data']['tax'];
                 }
             }
-            foreach ($order->line_items as $line_item) {
-                if ($line_item['type'] == 'shipping') {
-                    $shipping_basket_item = new WirecardCEE_Stdlib_Basket_Item('shipping');
-                    $taxable = in_array($line_item['type'], $tax->taxed_line_items);
-                    $shipping_basket_item->setName('Shipping')
-                        ->setUnitNetAmount(number_format($line_item['amount'], 2))
-                        ->setUnitGrossAmount(number_format($taxable ? $line_item['amount'] * ($tax->rate + 1) : $line_item['amount'], 2))
-                        ->setUnitTaxAmount(number_format($taxable ? $line_item['amount'] * (1 + $tax->rate) - $line_item['amount'] : 0, 2))
-                        ->setUnitTaxRate(number_format($taxable ? $tax->rate * 100 : 0, 2));
 
-                    $basket->addItem($shipping_basket_item);
+            if (is_object($tax))
+            {
+                foreach ( $order->line_items as $line_item )
+                {
+                    if ( $line_item[ 'type' ] == 'shipping' )
+                    {
+                        $shipping_basket_item = new WirecardCEE_Stdlib_Basket_Item('shipping');
+                        $taxable = in_array($line_item['type'], $tax->taxed_line_items);
+                        $shipping_basket_item->setName('Shipping')
+                            ->setUnitNetAmount(number_format($line_item['amount'], 2))
+                            ->setUnitGrossAmount(number_format($taxable ? $line_item['amount'] * ($tax->rate + 1) : $line_item['amount'], 2))
+                            ->setUnitTaxAmount(number_format($taxable ? $line_item['amount'] * (1 + $tax->rate) - $line_item['amount'] : 0, 2))
+                            ->setUnitTaxRate(number_format($taxable ? $tax->rate * 100 : 0, 2));
+
+                        $basket->addItem($shipping_basket_item);
+                    }
                 }
             }
         }
@@ -952,9 +958,15 @@ function uc_wirecard_checkout_page_setBasketInformation(&$client, $paymenttype, 
 
             $basket_item->setName($product->title)
                 ->setUnitNetAmount(number_format($product->price, 2))
-                ->setUnitGrossAmount(number_format($product->price * ($tax->rate + 1),2))
+                ->setUnitGrossAmount(number_format($product->price, 2))
+                ->setUnitTaxAmount(0)
+                ->setUnitTaxRate(0);
+
+            if (is_object($tax)) {
+                $basket_item->setUnitGrossAmount(number_format($product->price * ($tax->rate + 1), 2))
                 ->setUnitTaxAmount(number_format($product->price * (1 + $tax->rate) - $product->price,2))
                 ->setUnitTaxRate(number_format($tax->rate * 100, 2));
+            }
 
             $basket->addItem($basket_item, $product->qty);
         }
